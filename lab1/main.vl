@@ -1,0 +1,43 @@
+module main;
+    reg [7:0]   lexemsVector[0:1023][0:32];
+    integer     lexemsSizesVector[0:1023];
+    integer     lexemsCount;
+
+    integer fd, i, j, k;
+
+    reg signed [8:0] char;
+
+    initial begin
+        lexemsCount = 0;
+        lexemsSizesVector[0] = 0;
+        
+        fd = $fopen("input.asm", "r");
+
+        if (!fd) begin
+            $display("ERROR: File unexists.");
+            $finish;
+        end
+
+        while (!$feof(fd)) begin
+            char = $fgetc(fd);
+
+            if (char[7:0] != 10) begin
+                lexemsVector[lexemsCount][lexemsSizesVector[lexemsCount]] = char[7:0];
+                lexemsSizesVector[lexemsCount] += 1;
+            end else begin
+                lexemsCount += 1;
+                lexemsSizesVector[lexemsCount] = 0;
+            end
+        end
+        lexemsCount += 1;
+        $fclose(fd);
+
+        for (i = 0; i < lexemsCount; i++) begin
+            for (j = 0; j < lexemsSizesVector[i]; j++) begin
+                $write("%s", lexemsVector[i][j]);
+            end
+            $write("_\n_");
+        end
+        
+    end
+endmodule
