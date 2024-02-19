@@ -3,9 +3,10 @@ module main;
     integer     lexemsSizesVector[0:1023];
     integer     lexemsCount;
 
-    integer fd, i, j, k;
+    integer fd, i, j;
 
-    reg signed [8:0] char;
+    reg [7:0] char;
+    reg isComment;
 
     initial begin
         lexemsCount = 0;
@@ -21,22 +22,33 @@ module main;
         while (!$feof(fd)) begin
             char = $fgetc(fd);
 
-            if (char[7:0] != 10) begin
-                lexemsVector[lexemsCount][lexemsSizesVector[lexemsCount]] = char[7:0];
-                lexemsSizesVector[lexemsCount] += 1;
+            if (isComment == 1) begin // игнорируем, если это коммент
+            end else if (char == 59 || char == 10 || char == 9 || char == 32) begin // `;`, `\n`, `\t`, ` `
+                if (lexemsSizesVector[lexemsCount] != 0) begin
+                    lexemsCount += 1;
+                    lexemsSizesVector[lexemsCount] = 0;
+                end
             end else begin
-                lexemsCount += 1;
-                lexemsSizesVector[lexemsCount] = 0;
+                lexemsVector[lexemsCount][lexemsSizesVector[lexemsCount]] = char;
+                lexemsSizesVector[lexemsCount] += 1;
+            end
+
+            if (char == 59) begin // символ `;`
+                isComment = 1;
+            end else if (char == 10) begin // символ `\n`
+                isComment = 0;
             end
         end
-        lexemsCount += 1;
+        if (lexemsSizesVector[lexemsCount] != 0) begin
+            lexemsCount += 1;
+        end
         $fclose(fd);
 
         for (i = 0; i < lexemsCount; i++) begin
             for (j = 0; j < lexemsSizesVector[i]; j++) begin
                 $write("%s", lexemsVector[i][j]);
             end
-            $write("_\n_");
+            $write("\n");
         end
         
     end
