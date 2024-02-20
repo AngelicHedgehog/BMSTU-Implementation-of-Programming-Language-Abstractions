@@ -1,55 +1,666 @@
-module main;
-    reg [7:0]   lexemsVector[0:1023][0:32];
-    integer     lexemsSizesVector[0:1023];
-    integer     lexemsCount;
+`define MAX_LEXEM_COUNT 1024
+`define MAX_LEXEM_SIZE  32
+`define MAX_LABELS      512
+`define MEMMORY_LIMIT   1_000_000
 
-    integer fd, i, j;
+module main;
+    reg [7:0]   lexemsArray[0:`MAX_LEXEM_COUNT-1][0:`MAX_LEXEM_SIZE-1];
+    integer     lexemsSizesArray[0:`MAX_LEXEM_COUNT-1];
+    integer     lexemsCount = 0;
+
+    reg [7:0]       labelsArray[0:`MAX_LABELS-1][0:`MAX_LEXEM_SIZE-1];
+    integer         labelsSizesArray[0:`MAX_LABELS-1];
+    integer signed  labelsValuesArray[0:`MAX_LABELS-1];
+    integer         labelsCount;
+    integer         builtInInstuctionsCount;
+
+    integer signed  memmory[0:`MEMMORY_LIMIT-1];    // память машины
+    integer         reg_IP;     // указатель инструкций (instruction pointer)
+    integer         reg_SP;     // указатель стека (stack pointer)
+    integer         reg_FP;     // указатель базы (frame pointer)
+    integer         reg_RV;     // — возвращаемое значение (return value)
+
+    localparam CHAR_TAB         = 9;
+    localparam CHAR_NEWLINE     = 10;
+    localparam CHAR_SPACE       = 32;
+    localparam CHAR_PLUS        = 43;
+    localparam CHAR_MINUS       = 45;
+    localparam CHAR_HYPHEN      = 45;
+    localparam CHAR_0           = 48;
+    localparam CHAR_9           = 57;
+    localparam CHAR_COLON       = 58;
+    localparam CHAR_SEMICOLON   = 59;
+    localparam CHAR_A           = 65;
+    localparam CHAR_B           = 66;
+    localparam CHAR_C           = 67;
+    localparam CHAR_D           = 68;
+    localparam CHAR_E           = 69;
+    localparam CHAR_F           = 70;
+    localparam CHAR_G           = 71;
+    localparam CHAR_H           = 72;
+    localparam CHAR_I           = 73;
+    localparam CHAR_J           = 74;
+    localparam CHAR_K           = 75;
+    localparam CHAR_L           = 76;
+    localparam CHAR_M           = 77;
+    localparam CHAR_N           = 78;
+    localparam CHAR_O           = 79;
+    localparam CHAR_P           = 80;
+    localparam CHAR_Q           = 81;
+    localparam CHAR_R           = 82;
+    localparam CHAR_S           = 83;
+    localparam CHAR_T           = 84;
+    localparam CHAR_U           = 85;
+    localparam CHAR_V           = 86;
+    localparam CHAR_W           = 87;
+    localparam CHAR_X           = 88;
+    localparam CHAR_Y           = 89;
+    localparam CHAR_Z           = 90;
+    localparam CHAR_UNDERSCORE  = 95;
+    localparam CHAR_a           = 97;
+    localparam CHAR_z           = 122;
+
+    integer fd, i, j, k, current;
 
     reg [7:0] char;
-    reg isComment;
+    reg isComment, isEqual, isNegativ, wasFound;
 
     initial begin
         lexemsCount = 0;
-        lexemsSizesVector[0] = 0;
+        lexemsSizesArray[0] = 0;
         
-        fd = $fopen("input.asm", "r");
+        fd = $fopen("fib.asm", "r");
 
         if (!fd) begin
-            $display("ERROR: File unexists.");
-            $finish;
+            $write("FileError: File unexists.\n");
+            $finish(1);
         end
 
         while (!$feof(fd)) begin
             char = $fgetc(fd);
 
             if (isComment == 1) begin // игнорируем, если это коммент
-            end else if (char == 59 || char == 10 || char == 9 || char == 32) begin // `;`, `\n`, `\t`, ` `
-                if (lexemsSizesVector[lexemsCount] != 0) begin
-                    lexemsCount += 1;
-                    lexemsSizesVector[lexemsCount] = 0;
+            end else if (
+                char == CHAR_SEMICOLON  ||
+                char == CHAR_NEWLINE    ||
+                char == CHAR_TAB        ||
+                char == CHAR_SPACE
+            ) begin  // следующая лехема
+                if (lexemsSizesArray[lexemsCount] != 0) begin
+                    ++lexemsCount;
+                    lexemsSizesArray[lexemsCount] = 0;
                 end
-            end else begin
-                lexemsVector[lexemsCount][lexemsSizesVector[lexemsCount]] = char;
-                lexemsSizesVector[lexemsCount] += 1;
+            end else begin  // следующий символ лексемы
+
+                if (lexemsCount >= `MAX_LEXEM_COUNT) begin
+                    $write("SyntaxError: Too many lexems. Max lexem count - %d.\n", `MAX_LEXEM_COUNT);
+                    $finish(1);
+                end
+
+                if (lexemsSizesArray[lexemsCount] >= `MAX_LEXEM_SIZE) begin
+                    $write("SyntaxError: Too long lexem - ");
+                    for (i = 0; i != lexemsSizesArray[lexemsCount]; ++i) begin
+                        $write("%s", lexemsArray[lexemsCount][i]);
+                    end
+                    $write(". Max lexem size - %d.\n", `MAX_LEXEM_SIZE);
+                    $finish(1);
+                end
+
+                lexemsArray[lexemsCount][lexemsSizesArray[lexemsCount]] = char;
+                ++lexemsSizesArray[lexemsCount];
             end
 
-            if (char == 59) begin // символ `;`
+            if (char == CHAR_SEMICOLON) begin  // начало коммента
                 isComment = 1;
-            end else if (char == 10) begin // символ `\n`
+            end else if (char == CHAR_NEWLINE) begin  // конец коммента
                 isComment = 0;
             end
         end
-        if (lexemsSizesVector[lexemsCount] != 0) begin
-            lexemsCount += 1;
+        --lexemsSizesArray[lexemsCount];
+        if (lexemsSizesArray[lexemsCount] > 0) begin
+            ++lexemsCount;
         end
         $fclose(fd);
 
-        for (i = 0; i < lexemsCount; i++) begin
-            for (j = 0; j < lexemsSizesVector[i]; j++) begin
-                $write("%s", lexemsVector[i][j]);
-            end
-            $write("\n");
-        end
+        // for (i = 0; i != lexemsCount; ++i) begin
+        //     for (j = 0; j != lexemsSizesArray[i]; ++j) begin
+        //         $write("%s", lexemsArray[i][j]);
+        //     end
+        //     $write("\n---\n");
+        // end
         
+        // 41 мнемотика......................
+        labelsArray[0][0] = CHAR_P;
+        labelsArray[0][1] = CHAR_R;
+        labelsArray[0][2] = CHAR_O;
+        labelsArray[0][3] = CHAR_G;
+        labelsArray[0][4] = CHAR_R;
+        labelsArray[0][5] = CHAR_A;
+        labelsArray[0][6] = CHAR_M;
+        labelsArray[0][7] = CHAR_UNDERSCORE;
+        labelsArray[0][8] = CHAR_S;
+        labelsArray[0][9] = CHAR_I;
+        labelsArray[0][10] = CHAR_Z;
+        labelsArray[0][11] = CHAR_E;
+        labelsSizesArray[0] = 12;
+        labelsCount = 1;
+
+        labelsArray[labelsCount][0] = CHAR_A;
+        labelsArray[labelsCount][1] = CHAR_D;
+        labelsArray[labelsCount][2] = CHAR_D;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -1;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_S;
+        labelsArray[labelsCount][1] = CHAR_U;
+        labelsArray[labelsCount][2] = CHAR_B;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -2;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_M;
+        labelsArray[labelsCount][1] = CHAR_U;
+        labelsArray[labelsCount][2] = CHAR_L;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -3;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_D;
+        labelsArray[labelsCount][1] = CHAR_I;
+        labelsArray[labelsCount][2] = CHAR_V;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -4;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_M;
+        labelsArray[labelsCount][1] = CHAR_O;
+        labelsArray[labelsCount][2] = CHAR_D;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -5;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_N;
+        labelsArray[labelsCount][1] = CHAR_E;
+        labelsArray[labelsCount][2] = CHAR_G;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -6;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_B;
+        labelsArray[labelsCount][1] = CHAR_I;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsArray[labelsCount][3] = CHAR_A;
+        labelsArray[labelsCount][4] = CHAR_N;
+        labelsArray[labelsCount][5] = CHAR_D;
+        labelsSizesArray[labelsCount] = 6;
+        labelsValuesArray[labelsCount] = -7;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_B;
+        labelsArray[labelsCount][1] = CHAR_I;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsArray[labelsCount][3] = CHAR_O;
+        labelsArray[labelsCount][4] = CHAR_R;
+        labelsSizesArray[labelsCount] = 5;
+        labelsValuesArray[labelsCount] = -8;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_B;
+        labelsArray[labelsCount][1] = CHAR_O;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsArray[labelsCount][3] = CHAR_N;
+        labelsArray[labelsCount][4] = CHAR_O;
+        labelsArray[labelsCount][5] = CHAR_T;
+        labelsSizesArray[labelsCount] = 6;
+        labelsValuesArray[labelsCount] = -9;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_L;
+        labelsArray[labelsCount][1] = CHAR_S;
+        labelsArray[labelsCount][2] = CHAR_H;
+        labelsArray[labelsCount][3] = CHAR_I;
+        labelsArray[labelsCount][4] = CHAR_F;
+        labelsArray[labelsCount][5] = CHAR_T;
+        labelsSizesArray[labelsCount] = 6;
+        labelsValuesArray[labelsCount] = -10;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_R;
+        labelsArray[labelsCount][1] = CHAR_S;
+        labelsArray[labelsCount][2] = CHAR_H;
+        labelsArray[labelsCount][3] = CHAR_I;
+        labelsArray[labelsCount][4] = CHAR_F;
+        labelsArray[labelsCount][5] = CHAR_T;
+        labelsSizesArray[labelsCount] = 6;
+        labelsValuesArray[labelsCount] = -11;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_D;
+        labelsArray[labelsCount][1] = CHAR_U;
+        labelsArray[labelsCount][2] = CHAR_P;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -12;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_D;
+        labelsArray[labelsCount][1] = CHAR_R;
+        labelsArray[labelsCount][2] = CHAR_O;
+        labelsArray[labelsCount][3] = CHAR_P;
+        labelsSizesArray[labelsCount] = 4;
+        labelsValuesArray[labelsCount] = -13;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_S;
+        labelsArray[labelsCount][1] = CHAR_W;
+        labelsArray[labelsCount][2] = CHAR_A;
+        labelsArray[labelsCount][3] = CHAR_P;
+        labelsSizesArray[labelsCount] = 4;
+        labelsValuesArray[labelsCount] = -14;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_R;
+        labelsArray[labelsCount][1] = CHAR_O;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -15;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_O;
+        labelsArray[labelsCount][1] = CHAR_V;
+        labelsArray[labelsCount][2] = CHAR_E;
+        labelsArray[labelsCount][3] = CHAR_R;
+        labelsSizesArray[labelsCount] = 4;
+        labelsValuesArray[labelsCount] = -16;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_D;
+        labelsArray[labelsCount][1] = CHAR_R;
+        labelsArray[labelsCount][2] = CHAR_O;
+        labelsArray[labelsCount][3] = CHAR_P;
+        labelsArray[labelsCount][4] = CHAR_N;
+        labelsSizesArray[labelsCount] = 5;
+        labelsValuesArray[labelsCount] = -17;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_P;
+        labelsArray[labelsCount][1] = CHAR_U;
+        labelsArray[labelsCount][2] = CHAR_S;
+        labelsArray[labelsCount][3] = CHAR_H;
+        labelsArray[labelsCount][4] = CHAR_N;
+        labelsSizesArray[labelsCount] = 5;
+        labelsValuesArray[labelsCount] = -18;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_L;
+        labelsArray[labelsCount][1] = CHAR_O;
+        labelsArray[labelsCount][2] = CHAR_A;
+        labelsArray[labelsCount][3] = CHAR_D;
+        labelsSizesArray[labelsCount] = 4;
+        labelsValuesArray[labelsCount] = -19;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_S;
+        labelsArray[labelsCount][1] = CHAR_A;
+        labelsArray[labelsCount][2] = CHAR_V;
+        labelsArray[labelsCount][3] = CHAR_E;
+        labelsSizesArray[labelsCount] = 4;
+        labelsValuesArray[labelsCount] = -20;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_G;
+        labelsArray[labelsCount][1] = CHAR_E;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsArray[labelsCount][3] = CHAR_I;
+        labelsArray[labelsCount][4] = CHAR_P;
+        labelsSizesArray[labelsCount] = 5;
+        labelsValuesArray[labelsCount] = -21;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_S;
+        labelsArray[labelsCount][1] = CHAR_E;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsArray[labelsCount][3] = CHAR_I;
+        labelsArray[labelsCount][4] = CHAR_P;
+        labelsSizesArray[labelsCount] = 5;
+        labelsValuesArray[labelsCount] = -22;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_G;
+        labelsArray[labelsCount][1] = CHAR_E;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsArray[labelsCount][3] = CHAR_S;
+        labelsArray[labelsCount][4] = CHAR_P;
+        labelsSizesArray[labelsCount] = 5;
+        labelsValuesArray[labelsCount] = -23;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_S;
+        labelsArray[labelsCount][1] = CHAR_E;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsArray[labelsCount][3] = CHAR_S;
+        labelsArray[labelsCount][4] = CHAR_P;
+        labelsSizesArray[labelsCount] = 5;
+        labelsValuesArray[labelsCount] = -24;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_G;
+        labelsArray[labelsCount][1] = CHAR_E;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsArray[labelsCount][3] = CHAR_F;
+        labelsArray[labelsCount][4] = CHAR_P;
+        labelsSizesArray[labelsCount] = 5;
+        labelsValuesArray[labelsCount] = -25;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_S;
+        labelsArray[labelsCount][1] = CHAR_E;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsArray[labelsCount][3] = CHAR_F;
+        labelsArray[labelsCount][4] = CHAR_P;
+        labelsSizesArray[labelsCount] = 5;
+        labelsValuesArray[labelsCount] = -26;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_G;
+        labelsArray[labelsCount][1] = CHAR_E;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsArray[labelsCount][3] = CHAR_R;
+        labelsArray[labelsCount][4] = CHAR_V;
+        labelsSizesArray[labelsCount] = 5;
+        labelsValuesArray[labelsCount] = -27;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_S;
+        labelsArray[labelsCount][1] = CHAR_E;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsArray[labelsCount][3] = CHAR_R;
+        labelsArray[labelsCount][4] = CHAR_V;
+        labelsSizesArray[labelsCount] = 5;
+        labelsValuesArray[labelsCount] = -28;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_C;
+        labelsArray[labelsCount][1] = CHAR_M;
+        labelsArray[labelsCount][2] = CHAR_P;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -29;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_J;
+        labelsArray[labelsCount][1] = CHAR_M;
+        labelsArray[labelsCount][2] = CHAR_P;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -22;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_J;
+        labelsArray[labelsCount][1] = CHAR_L;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -30;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_J;
+        labelsArray[labelsCount][1] = CHAR_G;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -31;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_J;
+        labelsArray[labelsCount][1] = CHAR_E;
+        labelsArray[labelsCount][2] = CHAR_Q;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -32;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_J;
+        labelsArray[labelsCount][1] = CHAR_L;
+        labelsArray[labelsCount][2] = CHAR_E;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -33;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_J;
+        labelsArray[labelsCount][1] = CHAR_G;
+        labelsArray[labelsCount][2] = CHAR_E;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -34;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_J;
+        labelsArray[labelsCount][1] = CHAR_N;
+        labelsArray[labelsCount][2] = CHAR_E;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -35;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_C;
+        labelsArray[labelsCount][1] = CHAR_A;
+        labelsArray[labelsCount][2] = CHAR_L;
+        labelsArray[labelsCount][3] = CHAR_L;
+        labelsSizesArray[labelsCount] = 4;
+        labelsValuesArray[labelsCount] = -36;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_R;
+        labelsArray[labelsCount][1] = CHAR_E;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsArray[labelsCount][3] = CHAR_N;
+        labelsSizesArray[labelsCount] = 4;
+        labelsValuesArray[labelsCount] = -37;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_I;
+        labelsArray[labelsCount][1] = CHAR_N;
+        labelsSizesArray[labelsCount] = 2;
+        labelsValuesArray[labelsCount] = -38;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_O;
+        labelsArray[labelsCount][1] = CHAR_U;
+        labelsArray[labelsCount][2] = CHAR_T;
+        labelsSizesArray[labelsCount] = 3;
+        labelsValuesArray[labelsCount] = -39;
+        ++labelsCount;
+
+        labelsArray[labelsCount][0] = CHAR_H;
+        labelsArray[labelsCount][1] = CHAR_A;
+        labelsArray[labelsCount][2] = CHAR_L;
+        labelsArray[labelsCount][3] = CHAR_T;
+        labelsSizesArray[labelsCount] = 4;
+        labelsValuesArray[labelsCount] = -40;
+        ++labelsCount;
+
+        builtInInstuctionsCount = labelsCount;
+
+        // первый проход ==========>
+        current = 256;
+        for (i = 0; i != lexemsCount; ++i) begin
+            if (lexemsArray[i][0] == CHAR_COLON) begin
+
+                // проверка синтаксиса метки
+                if (
+                    lexemsSizesArray[i] < 2 ||
+                    !(
+                        CHAR_a <= lexemsArray[i][1] && lexemsArray[i][1] <= CHAR_z ||
+                        CHAR_A <= lexemsArray[i][1] && lexemsArray[i][1] <= CHAR_Z ||
+                        lexemsArray[i][1] == CHAR_UNDERSCORE
+                    )
+                ) begin
+                    $write("SyntaxError: Invalid label syntax - '");
+                    for (j = 0; j != lexemsSizesArray[i]; ++j) begin
+                        $write("%s", lexemsArray[i][j]);
+                    end
+                    $write("'. Must be - ':[a-zA-Z_][a-zA-Z0-9_-]*'.\n");
+                    $finish(1);
+                end
+                for (j = 2; j != lexemsSizesArray[i]; ++j) begin
+                    if (!(
+                        CHAR_a <= lexemsArray[i][j] && lexemsArray[i][j] <= CHAR_z  ||
+                        CHAR_A <= lexemsArray[i][j] && lexemsArray[i][j] <= CHAR_Z  ||
+                        CHAR_0 <= lexemsArray[i][j] && lexemsArray[i][j] <= CHAR_9  ||
+                        lexemsArray[i][j] == CHAR_UNDERSCORE                        ||
+                        lexemsArray[i][j] == CHAR_HYPHEN
+                    )) begin
+                        $write("SyntaxError: Invalid label syntax - '");
+                        for (k = 0; k != lexemsSizesArray[i]; ++k) begin
+                            $write("%s", lexemsArray[i][k]);
+                        end
+                        $write("'. Must be - ':[a-zA-Z_][a-zA-Z0-9_-]*'.\n");
+                        $finish(1);
+                    end
+                end
+                // проверка на уникальность метки
+                for (j = 0; j != labelsCount; ++j) begin
+                    if (lexemsSizesArray[i] == labelsSizesArray[j]) begin
+                        isEqual = 1;
+                        for (k = 0; k != lexemsSizesArray[i]; ++k) begin
+                            if (lexemsArray[i][k] != labelsArray[j][k]) begin
+                                isEqual = 0;
+                                k = lexemsSizesArray[i] - 1;  // break
+                            end
+                        end
+                        if (isEqual == 1) begin
+                            $write("SyntaxError: This label yet exists - ");
+                            for (k = 0; k != lexemsSizesArray[i]; ++k) begin
+                                $write("%s", lexemsArray[i][k]);
+                            end
+                            $write(".\n");
+                            $finish(1);
+                        end
+                    end
+                end
+                // проверка на превышение количества меток
+                if (labelsCount == `MAX_LABELS) begin
+                    $write("SyntaxError: Too many labels. Max size - %d.\n", `MAX_LABELS);
+                    $finish(1);
+                end
+
+                labelsSizesArray[labelsCount] = lexemsSizesArray[i] - 1;
+                for (j = 1; j != lexemsSizesArray[i]; ++j) begin
+                    labelsArray[labelsCount][j - 1] = lexemsArray[i][j];
+                end
+                labelsValuesArray[labelsCount] = current;
+                ++labelsCount;
+                --current;  // не учитываем метки при подсчете слов программы
+            end
+            ++current;
+        end
+        labelsValuesArray[0] = current;
+
+        // for (i = 0; i != labelsCount; ++i) begin
+        //     for (j = 0; j != labelsSizesArray[i]; ++j) begin
+        //         $write("%s", labelsArray[i][j]);
+        //     end
+        //     $write(": value-%d\n", labelsValuesArray[i]);
+        // end
+
+        // второй проход ==========>
+        current = 256;
+        for (i = 0; i != lexemsCount; ++i) begin
+
+            // игнорируем метки
+            if (lexemsArray[i][0] == CHAR_COLON) begin
+                --current;  // не оставляем дыр в памяти из-за меток
+            end else if (  // распознаем числа
+                lexemsArray[i][0] == CHAR_PLUS      ||
+                lexemsArray[i][0] == CHAR_MINUS     ||
+                CHAR_0 <= lexemsArray[i][0] && lexemsArray[i][0] <= CHAR_9
+            ) begin
+                isNegativ = 0;
+                j = 0;
+                if (lexemsArray[i][0] == CHAR_MINUS) begin
+                    isNegativ = 1;
+                    j = 1;
+                end else if (lexemsArray[i][0] == CHAR_PLUS) begin
+                    j = 1;
+                end
+                // пустая последовательность десятичным цифр
+                if (j == lexemsSizesArray[i]) begin
+                    $write("SyntaxError: Invalid digit - '");
+                    for (k = 0; k != lexemsSizesArray[i]; ++k) begin
+                        $write("%s", lexemsArray[i][k]);
+                    end
+                    $write("'. Must be - '[+-]?[0-9]+'.\n");
+                    $finish(1);
+                end
+                // преобразуем строку в число
+                memmory[current] = 0;
+                for (j = j; j != lexemsSizesArray[i]; ++j) begin
+                    memmory[current] = memmory[current] * 10 + (lexemsArray[i][j] - CHAR_0);
+                end
+                if (isNegativ == 1) begin
+                    memmory[current] *= -1;
+                end
+            end else if (  // распознаем идентификаторы
+                CHAR_a <= lexemsArray[i][0] && lexemsArray[i][0] <= CHAR_z ||
+                CHAR_A <= lexemsArray[i][0] && lexemsArray[i][0] <= CHAR_Z ||
+                lexemsArray[i][0] == CHAR_UNDERSCORE
+            ) begin
+                // подходит ли под шаблон идентификатора
+                for (j = 1; j != lexemsSizesArray[i]; ++j) begin
+                    if (!(
+                        CHAR_a <= lexemsArray[i][j] && lexemsArray[i][j] <= CHAR_z  ||
+                        CHAR_A <= lexemsArray[i][j] && lexemsArray[i][j] <= CHAR_Z  ||
+                        CHAR_0 <= lexemsArray[i][j] && lexemsArray[i][j] <= CHAR_9  ||
+                        lexemsArray[i][j] == CHAR_UNDERSCORE                        ||
+                        lexemsArray[i][j] == CHAR_HYPHEN
+                    )) begin
+                        $write("SyntaxError: Invalid identificator syntax - '");
+                        for (k = 0; k != lexemsSizesArray[i]; ++k) begin
+                            $write("%s", lexemsArray[i][k]);
+                        end
+                        $write("'. Must be - ':[a-zA-Z_][a-zA-Z0-9_-]*'.\n");
+                        $finish(1);
+                    end
+                end
+
+                // ищем среди записанных мнемоник и меток
+                wasFound = 0;
+                for (j = 0; j != labelsCount; ++j) begin
+                    if (lexemsSizesArray[i] == labelsSizesArray[j]) begin
+                        isEqual = 1;
+                        for (k = 0; k != lexemsSizesArray[i]; ++k) begin
+                            if (lexemsArray[i][k] != labelsArray[j][k]) begin
+                                isEqual = 0;
+                                k = lexemsSizesArray[i] - 1;  // break
+                            end
+                        end
+                        if (isEqual == 1) begin
+                            wasFound = 1;
+                            memmory[current] = labelsValuesArray[j];
+                            j = labelsCount - 1;  // break
+                        end
+                    end
+                end
+                // ошибка, если идентификатор не найден
+                if (wasFound == 0) begin
+                    $write("SyntaxError: Identificator not exists - '");
+                    for (j = 0; j != lexemsSizesArray[i]; ++j) begin
+                        $write("%s", lexemsArray[i][j]);
+                    end
+                    $write("'.\n");
+                    $finish(1);
+                end
+            end else begin  // лексема не распознана
+                $write("SyntaxError: Lexem did not recognized - '");
+                for (j = 0; j != lexemsSizesArray[i]; ++j) begin
+                    $write("%s", lexemsArray[i][j]);
+                end
+                $write("'. Must be digit - '[+-]?[0-9]+' ");
+                $write("or identificator - '[a-zA-Z_][a-zA-Z0-9_-]*'.\n");
+                $finish(1);
+            end
+
+            // for (j = 0; j != lexemsSizesArray[i]; ++j) begin
+            //     $write("%s", lexemsArray[i][j]);
+            // end
+            // $write("\t%d\n", memmory[current]);
+
+            ++current;
+        end
+
     end
 endmodule
