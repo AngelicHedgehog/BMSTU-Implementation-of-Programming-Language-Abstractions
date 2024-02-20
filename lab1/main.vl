@@ -15,7 +15,6 @@ module main;
     integer         labelsSizesArray[0:`MAX_LABELS-1];
     integer signed  labelsValuesArray[0:`MAX_LABELS-1];
     integer         labelsCount;
-    integer         builtInInstuctionsCount;
 
     integer signed  memmory[0:`MEMMORY_LIMIT-1];    // память машины
     integer         reg_IP;     // указатель инструкций (instruction pointer)
@@ -523,8 +522,6 @@ module main;
         labelsSizesArray[labelsCount] = 4;
         labelsValuesArray[labelsCount] = CMD_HALT;
         ++labelsCount;
-
-        builtInInstuctionsCount = labelsCount;
 
 
         // первый проход ==========>
