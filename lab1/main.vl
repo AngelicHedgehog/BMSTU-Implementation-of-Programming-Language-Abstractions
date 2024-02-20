@@ -1231,6 +1231,9 @@ module main;
                 default : begin
                     if (memmory[reg_IP] >= 0) begin
                         memmory[--reg_SP] = memmory[reg_IP++];
+                    end else begin
+                        $write("RuntimeError: line~%d: Unknown command - '%d'.\n", (reg_SP - 256), memmory[reg_IP]);
+                        $finish(1);
                     end
                 end
             endcase
