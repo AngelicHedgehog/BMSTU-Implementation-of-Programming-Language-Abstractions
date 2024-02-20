@@ -6,7 +6,7 @@
 
 module main;
     // имена файлов
-    localparam targerProgramFile    = "fact.asm";
+    localparam targerProgramFile    = "listSum.asm";
     localparam stdinFile            = "stdin.txt";
 
     // лексемы
@@ -1273,7 +1273,7 @@ module main;
                 end
 
                 default : begin
-                    if (memmory[reg_IP] >= 0) begin  // неотрицательное число помещаем на вершины стека
+                    if (memmory[reg_IP] >= 0) begin  // неотрицательное число помещаем на вершину стека
                         memmory[--reg_SP] = memmory[reg_IP++];
                     end else begin  // ошибка, если слово не распознано ни как интсрукция, ни как неотрицательное число
                         $write("RuntimeError: line~%d: Unknown command - '%d'.\n", (reg_SP - 256), memmory[reg_IP]);
