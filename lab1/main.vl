@@ -20,6 +20,10 @@ module main;
     integer         reg_FP;     // указатель базы (frame pointer)
     integer         reg_RV;     // — возвращаемое значение (return value)
 
+    integer x, y, z, N, a, v;  // вспомогательные переменные при работе со стеком
+
+    localparam STACK_ERROR      = "RuntimeError: line~%d: In stack must be at least %d element for commant %s, but %d found.\n";
+
     localparam CHAR_TAB         = 9;
     localparam CHAR_NEWLINE     = 10;
     localparam CHAR_SPACE       = 32;
@@ -60,6 +64,49 @@ module main;
     localparam CHAR_a           = 97;
     localparam CHAR_z           = 122;
 
+    localparam CMD_ADD          = -1;
+    localparam CMD_SUB          = -2;
+    localparam CMD_MUL          = -3;
+    localparam CMD_DIV          = -4;
+    localparam CMD_MOD          = -5;
+    localparam CMD_NEG          = -6;
+    localparam CMD_BITAND       = -7;
+    localparam CMD_BITOR        = -8;
+    localparam CMD_BITNOT       = -9;
+    localparam CMD_LSHIFT       = -10;
+    localparam CMD_RSHIFT       = -11;
+    localparam CMD_DUP          = -12;
+    localparam CMD_DROP         = -13;
+    localparam CMD_SWAP         = -14;
+    localparam CMD_ROT          = -15;
+    localparam CMD_OVER         = -16;
+    localparam CMD_DROPN        = -17;
+    localparam CMD_PUSHN        = -18;
+    localparam CMD_LOAD         = -19;
+    localparam CMD_SAVE         = -20;
+    localparam CMD_GETIP        = -21;
+    localparam CMD_SETIP        = -22;
+    localparam CMD_GETSP        = -23;
+    localparam CMD_SETSP        = -24;
+    localparam CMD_GETFP        = -25;
+    localparam CMD_SETFP        = -26;
+    localparam CMD_GETRV        = -27;
+    localparam CMD_SETRV        = -28;
+    localparam CMD_CMP          = -29;
+    localparam CMD_JMP          = -22;
+    localparam CMD_JLT          = -30;
+    localparam CMD_JGT          = -31;
+    localparam CMD_JEQ          = -32;
+    localparam CMD_JLE          = -33;
+    localparam CMD_JGE          = -34;
+    localparam CMD_JNE          = -35;
+    localparam CMD_CALL         = -36;
+    localparam CMD_RETN         = -37;
+    localparam CMD_IN           = -38;
+    localparam CMD_OUT          = -39;
+    localparam CMD_HALT         = -40;
+    
+
     integer fd, i, j, k, current;
 
     reg [7:0] char;
@@ -69,7 +116,7 @@ module main;
         lexemsCount = 0;
         lexemsSizesArray[0] = 0;
         
-        fd = $fopen("fib.asm", "r");
+        fd = $fopen("hello.asm", "r");
 
         if (!fd) begin
             $write("FileError: File unexists.\n");
@@ -129,6 +176,7 @@ module main;
         //     $write("\n---\n");
         // end
         
+
         // 41 мнемотика......................
         labelsArray[0][0] = CHAR_P;
         labelsArray[0][1] = CHAR_R;
@@ -149,42 +197,42 @@ module main;
         labelsArray[labelsCount][1] = CHAR_D;
         labelsArray[labelsCount][2] = CHAR_D;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -1;
+        labelsValuesArray[labelsCount] = CMD_ADD;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_S;
         labelsArray[labelsCount][1] = CHAR_U;
         labelsArray[labelsCount][2] = CHAR_B;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -2;
+        labelsValuesArray[labelsCount] = CMD_SUB;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_M;
         labelsArray[labelsCount][1] = CHAR_U;
         labelsArray[labelsCount][2] = CHAR_L;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -3;
+        labelsValuesArray[labelsCount] = CMD_MUL;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_D;
         labelsArray[labelsCount][1] = CHAR_I;
         labelsArray[labelsCount][2] = CHAR_V;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -4;
+        labelsValuesArray[labelsCount] = CMD_DIV;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_M;
         labelsArray[labelsCount][1] = CHAR_O;
         labelsArray[labelsCount][2] = CHAR_D;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -5;
+        labelsValuesArray[labelsCount] = CMD_MOD;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_N;
         labelsArray[labelsCount][1] = CHAR_E;
         labelsArray[labelsCount][2] = CHAR_G;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -6;
+        labelsValuesArray[labelsCount] = CMD_NEG;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_B;
@@ -194,7 +242,7 @@ module main;
         labelsArray[labelsCount][4] = CHAR_N;
         labelsArray[labelsCount][5] = CHAR_D;
         labelsSizesArray[labelsCount] = 6;
-        labelsValuesArray[labelsCount] = -7;
+        labelsValuesArray[labelsCount] = CMD_BITAND;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_B;
@@ -203,7 +251,7 @@ module main;
         labelsArray[labelsCount][3] = CHAR_O;
         labelsArray[labelsCount][4] = CHAR_R;
         labelsSizesArray[labelsCount] = 5;
-        labelsValuesArray[labelsCount] = -8;
+        labelsValuesArray[labelsCount] = CMD_BITOR;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_B;
@@ -213,7 +261,7 @@ module main;
         labelsArray[labelsCount][4] = CHAR_O;
         labelsArray[labelsCount][5] = CHAR_T;
         labelsSizesArray[labelsCount] = 6;
-        labelsValuesArray[labelsCount] = -9;
+        labelsValuesArray[labelsCount] = CMD_BITNOT;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_L;
@@ -223,7 +271,7 @@ module main;
         labelsArray[labelsCount][4] = CHAR_F;
         labelsArray[labelsCount][5] = CHAR_T;
         labelsSizesArray[labelsCount] = 6;
-        labelsValuesArray[labelsCount] = -10;
+        labelsValuesArray[labelsCount] = CMD_LSHIFT;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_R;
@@ -233,14 +281,14 @@ module main;
         labelsArray[labelsCount][4] = CHAR_F;
         labelsArray[labelsCount][5] = CHAR_T;
         labelsSizesArray[labelsCount] = 6;
-        labelsValuesArray[labelsCount] = -11;
+        labelsValuesArray[labelsCount] = CMD_RSHIFT;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_D;
         labelsArray[labelsCount][1] = CHAR_U;
         labelsArray[labelsCount][2] = CHAR_P;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -12;
+        labelsValuesArray[labelsCount] = CMD_DUP;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_D;
@@ -248,7 +296,7 @@ module main;
         labelsArray[labelsCount][2] = CHAR_O;
         labelsArray[labelsCount][3] = CHAR_P;
         labelsSizesArray[labelsCount] = 4;
-        labelsValuesArray[labelsCount] = -13;
+        labelsValuesArray[labelsCount] = CMD_DROP;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_S;
@@ -256,14 +304,14 @@ module main;
         labelsArray[labelsCount][2] = CHAR_A;
         labelsArray[labelsCount][3] = CHAR_P;
         labelsSizesArray[labelsCount] = 4;
-        labelsValuesArray[labelsCount] = -14;
+        labelsValuesArray[labelsCount] = CMD_SWAP;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_R;
         labelsArray[labelsCount][1] = CHAR_O;
         labelsArray[labelsCount][2] = CHAR_T;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -15;
+        labelsValuesArray[labelsCount] = CMD_ROT;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_O;
@@ -271,7 +319,7 @@ module main;
         labelsArray[labelsCount][2] = CHAR_E;
         labelsArray[labelsCount][3] = CHAR_R;
         labelsSizesArray[labelsCount] = 4;
-        labelsValuesArray[labelsCount] = -16;
+        labelsValuesArray[labelsCount] = CMD_OVER;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_D;
@@ -280,7 +328,7 @@ module main;
         labelsArray[labelsCount][3] = CHAR_P;
         labelsArray[labelsCount][4] = CHAR_N;
         labelsSizesArray[labelsCount] = 5;
-        labelsValuesArray[labelsCount] = -17;
+        labelsValuesArray[labelsCount] = CMD_DROPN;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_P;
@@ -289,7 +337,7 @@ module main;
         labelsArray[labelsCount][3] = CHAR_H;
         labelsArray[labelsCount][4] = CHAR_N;
         labelsSizesArray[labelsCount] = 5;
-        labelsValuesArray[labelsCount] = -18;
+        labelsValuesArray[labelsCount] = CMD_PUSHN;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_L;
@@ -297,7 +345,7 @@ module main;
         labelsArray[labelsCount][2] = CHAR_A;
         labelsArray[labelsCount][3] = CHAR_D;
         labelsSizesArray[labelsCount] = 4;
-        labelsValuesArray[labelsCount] = -19;
+        labelsValuesArray[labelsCount] = CMD_LOAD;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_S;
@@ -305,7 +353,7 @@ module main;
         labelsArray[labelsCount][2] = CHAR_V;
         labelsArray[labelsCount][3] = CHAR_E;
         labelsSizesArray[labelsCount] = 4;
-        labelsValuesArray[labelsCount] = -20;
+        labelsValuesArray[labelsCount] = CMD_SAVE;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_G;
@@ -314,7 +362,7 @@ module main;
         labelsArray[labelsCount][3] = CHAR_I;
         labelsArray[labelsCount][4] = CHAR_P;
         labelsSizesArray[labelsCount] = 5;
-        labelsValuesArray[labelsCount] = -21;
+        labelsValuesArray[labelsCount] = CMD_GETIP;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_S;
@@ -323,7 +371,7 @@ module main;
         labelsArray[labelsCount][3] = CHAR_I;
         labelsArray[labelsCount][4] = CHAR_P;
         labelsSizesArray[labelsCount] = 5;
-        labelsValuesArray[labelsCount] = -22;
+        labelsValuesArray[labelsCount] = CMD_SETIP;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_G;
@@ -332,7 +380,7 @@ module main;
         labelsArray[labelsCount][3] = CHAR_S;
         labelsArray[labelsCount][4] = CHAR_P;
         labelsSizesArray[labelsCount] = 5;
-        labelsValuesArray[labelsCount] = -23;
+        labelsValuesArray[labelsCount] = CMD_GETSP;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_S;
@@ -341,7 +389,7 @@ module main;
         labelsArray[labelsCount][3] = CHAR_S;
         labelsArray[labelsCount][4] = CHAR_P;
         labelsSizesArray[labelsCount] = 5;
-        labelsValuesArray[labelsCount] = -24;
+        labelsValuesArray[labelsCount] = CMD_SETSP;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_G;
@@ -350,7 +398,7 @@ module main;
         labelsArray[labelsCount][3] = CHAR_F;
         labelsArray[labelsCount][4] = CHAR_P;
         labelsSizesArray[labelsCount] = 5;
-        labelsValuesArray[labelsCount] = -25;
+        labelsValuesArray[labelsCount] = CMD_GETFP;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_S;
@@ -359,7 +407,7 @@ module main;
         labelsArray[labelsCount][3] = CHAR_F;
         labelsArray[labelsCount][4] = CHAR_P;
         labelsSizesArray[labelsCount] = 5;
-        labelsValuesArray[labelsCount] = -26;
+        labelsValuesArray[labelsCount] = CMD_SETFP;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_G;
@@ -368,7 +416,7 @@ module main;
         labelsArray[labelsCount][3] = CHAR_R;
         labelsArray[labelsCount][4] = CHAR_V;
         labelsSizesArray[labelsCount] = 5;
-        labelsValuesArray[labelsCount] = -27;
+        labelsValuesArray[labelsCount] = CMD_GETRV;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_S;
@@ -377,63 +425,63 @@ module main;
         labelsArray[labelsCount][3] = CHAR_R;
         labelsArray[labelsCount][4] = CHAR_V;
         labelsSizesArray[labelsCount] = 5;
-        labelsValuesArray[labelsCount] = -28;
+        labelsValuesArray[labelsCount] = CMD_SETRV;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_C;
         labelsArray[labelsCount][1] = CHAR_M;
         labelsArray[labelsCount][2] = CHAR_P;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -29;
+        labelsValuesArray[labelsCount] = CMD_CMP;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_J;
         labelsArray[labelsCount][1] = CHAR_M;
         labelsArray[labelsCount][2] = CHAR_P;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -22;
+        labelsValuesArray[labelsCount] = CMD_JMP;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_J;
         labelsArray[labelsCount][1] = CHAR_L;
         labelsArray[labelsCount][2] = CHAR_T;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -30;
+        labelsValuesArray[labelsCount] = CMD_JLT;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_J;
         labelsArray[labelsCount][1] = CHAR_G;
         labelsArray[labelsCount][2] = CHAR_T;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -31;
+        labelsValuesArray[labelsCount] = CMD_JGT;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_J;
         labelsArray[labelsCount][1] = CHAR_E;
         labelsArray[labelsCount][2] = CHAR_Q;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -32;
+        labelsValuesArray[labelsCount] = CMD_JEQ;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_J;
         labelsArray[labelsCount][1] = CHAR_L;
         labelsArray[labelsCount][2] = CHAR_E;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -33;
+        labelsValuesArray[labelsCount] = CMD_JLE;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_J;
         labelsArray[labelsCount][1] = CHAR_G;
         labelsArray[labelsCount][2] = CHAR_E;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -34;
+        labelsValuesArray[labelsCount] = CMD_JGE;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_J;
         labelsArray[labelsCount][1] = CHAR_N;
         labelsArray[labelsCount][2] = CHAR_E;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -35;
+        labelsValuesArray[labelsCount] = CMD_JNE;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_C;
@@ -441,7 +489,7 @@ module main;
         labelsArray[labelsCount][2] = CHAR_L;
         labelsArray[labelsCount][3] = CHAR_L;
         labelsSizesArray[labelsCount] = 4;
-        labelsValuesArray[labelsCount] = -36;
+        labelsValuesArray[labelsCount] = CMD_CALL;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_R;
@@ -449,20 +497,20 @@ module main;
         labelsArray[labelsCount][2] = CHAR_T;
         labelsArray[labelsCount][3] = CHAR_N;
         labelsSizesArray[labelsCount] = 4;
-        labelsValuesArray[labelsCount] = -37;
+        labelsValuesArray[labelsCount] = CMD_RETN;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_I;
         labelsArray[labelsCount][1] = CHAR_N;
         labelsSizesArray[labelsCount] = 2;
-        labelsValuesArray[labelsCount] = -38;
+        labelsValuesArray[labelsCount] = CMD_IN;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_O;
         labelsArray[labelsCount][1] = CHAR_U;
         labelsArray[labelsCount][2] = CHAR_T;
         labelsSizesArray[labelsCount] = 3;
-        labelsValuesArray[labelsCount] = -39;
+        labelsValuesArray[labelsCount] = CMD_OUT;
         ++labelsCount;
 
         labelsArray[labelsCount][0] = CHAR_H;
@@ -470,10 +518,11 @@ module main;
         labelsArray[labelsCount][2] = CHAR_L;
         labelsArray[labelsCount][3] = CHAR_T;
         labelsSizesArray[labelsCount] = 4;
-        labelsValuesArray[labelsCount] = -40;
+        labelsValuesArray[labelsCount] = CMD_HALT;
         ++labelsCount;
 
         builtInInstuctionsCount = labelsCount;
+
 
         // первый проход ==========>
         current = 256;
@@ -542,7 +591,7 @@ module main;
                 for (j = 1; j != lexemsSizesArray[i]; ++j) begin
                     labelsArray[labelsCount][j - 1] = lexemsArray[i][j];
                 end
-                labelsValuesArray[labelsCount] = current;
+                labelsValuesArray[labelsCount] = -current;  // сохраняем отрицательный адрес памяти
                 ++labelsCount;
                 --current;  // не учитываем метки при подсчете слов программы
             end
@@ -556,6 +605,7 @@ module main;
         //     end
         //     $write(": value-%d\n", labelsValuesArray[i]);
         // end
+
 
         // второй проход ==========>
         current = 256;
@@ -630,7 +680,7 @@ module main;
                         end
                         if (isEqual == 1) begin
                             wasFound = 1;
-                            memmory[current] = labelsValuesArray[j];
+                            memmory[current] = labelsValuesArray[j];  // подставляем мнемотику или метку
                             j = labelsCount - 1;  // break
                         end
                     end
@@ -662,5 +712,65 @@ module main;
             ++current;
         end
 
+
+        // инциализация состояния старта виртуальной машины
+                                // начиная с адреса 256 загружены слова пользовательской программы
+        reg_IP = 256;           // будет выполнена самая первая инструкция
+        reg_SP = `MEMMORY_LIMIT; // прочитать со стека ничего нельзя, записать можно
+                                // значение регистров FP и RV не определено
+
+
+        forever begin
+            if (!(256 <= reg_IP && reg_IP < 256 + labelsValuesArray[0])) begin
+                $write("RuntimeError: register IP must be between 256 and %d.", labelsValuesArray[0]);
+                $write(" Your register IP - %d.\n", reg_IP);
+                $finish(1);
+            end
+            if (!(256 + labelsValuesArray[0] <= reg_SP && reg_SP <= `MEMMORY_LIMIT)) begin
+                $write("RuntimeError: line~%d: register SP must be between", (reg_IP - 256));
+                $write(" %d and %d.", labelsValuesArray[0], `MEMMORY_LIMIT);
+                $write(" Your register SP - %d.\n", reg_SP);
+                $finish(1);
+            end
+            case (memmory[reg_IP])
+                // CMD_ADD : begin
+                    
+                // end
+
+                // CMD_SUB : begin
+
+                // end
+
+                CMD_OUT : begin
+                    if (`MEMMORY_LIMIT - reg_SP < 1) begin
+                        $write(STACK_ERROR, (reg_IP - 256), 1, "OUT", (`MEMMORY_LIMIT - reg_SP));
+                        $finish(1);
+                    end
+
+                    char = memmory[reg_SP++];
+                    $write("%s", char);
+                    ++reg_IP;
+                end
+
+                    
+                CMD_HALT : begin
+                    if (`MEMMORY_LIMIT - reg_SP < 1) begin
+                        $write(STACK_ERROR, (reg_IP - 256), 1, "HALT", (`MEMMORY_LIMIT - reg_SP));
+                        $finish(1);
+                    end
+
+                    a = memmory[reg_SP++];
+                    $write("\n\nProgram terminated with code %d.\n", a);
+                    ++reg_IP;
+                    $finish;
+                end
+
+                default : begin
+                    if (memmory[reg_IP] >= 0) begin
+                        memmory[--reg_SP] = memmory[reg_IP++];
+                    end
+                end
+            endcase
+        end
     end
 endmodule
