@@ -6,8 +6,8 @@
 
 module main;
     // имена файлов
-    localparam targerProgramFile    = "listSum.asm";
-    localparam stdinFile            = "stdin.txt";
+    localparam targerProgramFile    = "lab1.asm";
+    localparam stdinFile            = "lab1.txt";
 
     // лексемы
     reg [7:0]   lexemsArray[0:`MAX_LEXEM_COUNT-1][0:`MAX_LEXEM_SIZE-1];
@@ -1126,7 +1126,8 @@ memmory adress must be between", (reg_IP - 256));
                 end
 
                 CMD_GETSP : begin
-                    memmory[--reg_SP] = reg_SP;
+                    a = reg_SP;
+                    memmory[--reg_SP] = a;
                     ++reg_IP;
                 end
 
