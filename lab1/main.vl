@@ -22,16 +22,20 @@ module main;
 
     // фактическая память машины
     integer signed  memmory[0:`MEMMORY_LIMIT-1];    // память машины
+    integer         program_size;  // размер программы в памяти машины
     integer         reg_IP;     // указатель инструкций (instruction pointer)
     integer         reg_SP;     // указатель стека (stack pointer)
-    integer         reg_FP;     // указатель базы (frame pointer)
-    integer         reg_RV;     // — возвращаемое значение (return value)
+    integer signed  reg_FP;     // указатель базы (frame pointer)
+    integer signed  reg_RV;     // возвращаемое значение (return value)
 
     // вспомогательные переменные при работе со стеком
-    integer x, y, z, N, a, v;
+    integer signed x, y, z, N, a, v;
 
-    // ошибка, выдаваемая при недостаточном размере стека при выпонении некоторой операции
-    localparam STACK_ERROR      = "RuntimeError: line~%d: %s: In stack must be at least %d element, but %d found.\n";
+    // ошибка, выдаваемая при недостаточном размере
+    //  стека при выпонении некоторой операции
+    localparam STACK_ERROR = 
+        "RuntimeError: line~%d: %s: In stack must \
+be at least %d element, but %d found.\n";
 
     // ASCII-коды нужных сиволов
     localparam CHAR_TAB         = 9;
@@ -154,7 +158,8 @@ module main;
 
                 // проверка на переполнение массива лексем
                 if (lexemsCount >= `MAX_LEXEM_COUNT) begin
-                    $write("SyntaxError: Too many lexems. Max lexem count - %d.\n", `MAX_LEXEM_COUNT);
+                    $write("SyntaxError: Too many lexems. Max lexem count - %d.\n",
+                                                                `MAX_LEXEM_COUNT);
                     $finish(1);
                 end
 
@@ -179,8 +184,10 @@ module main;
                 isComment = 0;
             end
         end
-        --lexemsSizesArray[lexemsCount];  // при чтении файла считывается символ с кодом 255. Странно. Удаляем.
-        if (lexemsSizesArray[lexemsCount] > 0) begin  // если чтение последней лексемы не закончено, заканчиваем
+        // при чтении файла считывается символ с кодом 255. Странно. Удаляем.
+        --lexemsSizesArray[lexemsCount];
+        // если чтение последней лексемы не закончено, заканчиваем
+        if (lexemsSizesArray[lexemsCount] > 0) begin
             ++lexemsCount;
         end
         $fclose(fd);  // закрыаем файл
@@ -553,8 +560,10 @@ module main;
                 if (
                     lexemsSizesArray[i] < 2 ||
                     !(
-                        CHAR_a <= lexemsArray[i][1] && lexemsArray[i][1] <= CHAR_z ||
-                        CHAR_A <= lexemsArray[i][1] && lexemsArray[i][1] <= CHAR_Z ||
+                        CHAR_a <= lexemsArray[i][1] &&
+                                  lexemsArray[i][1] <= CHAR_z ||
+                        CHAR_A <= lexemsArray[i][1] &&
+                                  lexemsArray[i][1] <= CHAR_Z ||
                         lexemsArray[i][1] == CHAR_UNDERSCORE
                     )
                 ) begin
@@ -568,9 +577,12 @@ module main;
                 // проверка остальных символов идентификатора
                 for (j = 2; j != lexemsSizesArray[i]; ++j) begin
                     if (!(
-                        CHAR_a <= lexemsArray[i][j] && lexemsArray[i][j] <= CHAR_z  ||
-                        CHAR_A <= lexemsArray[i][j] && lexemsArray[i][j] <= CHAR_Z  ||
-                        CHAR_0 <= lexemsArray[i][j] && lexemsArray[i][j] <= CHAR_9  ||
+                        CHAR_a <= lexemsArray[i][j] &&
+                                  lexemsArray[i][j] <= CHAR_z  ||
+                        CHAR_A <= lexemsArray[i][j] &&
+                                  lexemsArray[i][j] <= CHAR_Z  ||
+                        CHAR_0 <= lexemsArray[i][j] &&
+                                  lexemsArray[i][j] <= CHAR_9  ||
                         lexemsArray[i][j] == CHAR_UNDERSCORE                        ||
                         lexemsArray[i][j] == CHAR_HYPHEN
                     )) begin
@@ -604,7 +616,8 @@ module main;
                 end
                 // проверка на переполнение массива меток
                 if (labelsCount == `MAX_LABELS) begin
-                    $write("SyntaxError: Too many labels. Max size - %d.\n", `MAX_LABELS);
+                    $write("SyntaxError: Too many labels. Max size - %d.\n",
+                                                                    `MAX_LABELS);
                     $finish(1);
                 end
 
@@ -613,13 +626,16 @@ module main;
                 for (j = 1; j != lexemsSizesArray[i]; ++j) begin
                     labelsArray[labelsCount][j - 1] = lexemsArray[i][j];
                 end
-                labelsValuesArray[labelsCount] = current;  // сохраняем адрес памяти
+                // сохраняем адрес памяти
+                labelsValuesArray[labelsCount] = current;
                 ++labelsCount;
                 --current;  // не учитываем метки при подсчете слов программы
             end
             ++current;
         end
-        labelsValuesArray[0] = current;  // записываем значение мнемотики PROGRAM_SIZE
+        // записываем значение переменной PROGRAM_SIZE
+        program_size = current;
+        labelsValuesArray[0] = program_size;
 
         // // <<<<<======= ДЕБАГ: печать массива сохраненный мнемотик и меток
         // for (i = 0; i != labelsCount; ++i) begin
@@ -637,9 +653,10 @@ module main;
             if (lexemsArray[i][0] == CHAR_COLON) begin
                 --current;  // не оставляем дыр в памяти от меток
             end else if (  // распознаем первый симол числа
-                lexemsArray[i][0] == CHAR_PLUS      ||
-                lexemsArray[i][0] == CHAR_MINUS     ||
-                CHAR_0 <= lexemsArray[i][0] && lexemsArray[i][0] <= CHAR_9
+                lexemsArray[i][0] == CHAR_PLUS  ||
+                lexemsArray[i][0] == CHAR_MINUS ||
+                CHAR_0 <= lexemsArray[i][0] &&
+                          lexemsArray[i][0] <= CHAR_9
             ) begin
                 isNegativ = 0;
                 j = 0;
@@ -661,22 +678,28 @@ module main;
                 // преобразуем строку в число
                 memmory[current] = 0;
                 for (j = j; j != lexemsSizesArray[i]; ++j) begin
-                    memmory[current] = memmory[current] * 10 + (lexemsArray[i][j] - CHAR_0);
+                    memmory[current] *= 10;
+                    memmory[current] += (lexemsArray[i][j] - CHAR_0);
                 end
                 if (isNegativ == 1) begin
                     memmory[current] *= -1;
                 end
             end else if (  // распознаем первый символ идентификатора
-                CHAR_a <= lexemsArray[i][0] && lexemsArray[i][0] <= CHAR_z ||
-                CHAR_A <= lexemsArray[i][0] && lexemsArray[i][0] <= CHAR_Z ||
+                CHAR_a <= lexemsArray[i][0] &&
+                          lexemsArray[i][0] <= CHAR_z ||
+                CHAR_A <= lexemsArray[i][0] &&
+                          lexemsArray[i][0] <= CHAR_Z ||
                 lexemsArray[i][0] == CHAR_UNDERSCORE
             ) begin
                 // распознаем остальные симолы идентификатора
                 for (j = 1; j != lexemsSizesArray[i]; ++j) begin
                     if (!(
-                        CHAR_a <= lexemsArray[i][j] && lexemsArray[i][j] <= CHAR_z  ||
-                        CHAR_A <= lexemsArray[i][j] && lexemsArray[i][j] <= CHAR_Z  ||
-                        CHAR_0 <= lexemsArray[i][j] && lexemsArray[i][j] <= CHAR_9  ||
+                        CHAR_a <= lexemsArray[i][j] &&
+                                  lexemsArray[i][j] <= CHAR_z  ||
+                        CHAR_A <= lexemsArray[i][j] &&
+                                  lexemsArray[i][j] <= CHAR_Z  ||
+                        CHAR_0 <= lexemsArray[i][j] &&
+                                  lexemsArray[i][j] <= CHAR_9  ||
                         lexemsArray[i][j] == CHAR_UNDERSCORE                        ||
                         lexemsArray[i][j] == CHAR_HYPHEN
                     )) begin
@@ -702,7 +725,8 @@ module main;
                         end
                         if (isEqual == 1) begin
                             wasFound = 1;
-                            memmory[current] = labelsValuesArray[j];  // подставляем мнемотику или метку
+                            // подставляем мнемотику или метку
+                            memmory[current] = labelsValuesArray[j];
                             j = labelsCount - 1;  // break
                         end
                     end
@@ -726,7 +750,8 @@ module main;
                 $finish(1);
             end
 
-            // // <<<<<======= ДЕБАГ: итеративная печать исходной лексемы и соответсвующего ей записанного в память числа
+            // // <<<<<======= ДЕБАГ: итеративная печать исходной лексемы и
+            // //               соответсвующего ей записанного в память числа
             // for (j = 0; j != lexemsSizesArray[i]; ++j) begin
             //     $write("%s", lexemsArray[i][j]);
             // end
@@ -737,7 +762,8 @@ module main;
 
 
         // инциализация состояния старта виртуальной машины
-                                    // начиная с адреса 256 загружены слова пользовательской программы
+                                    // начиная с адреса 256 загружены 
+                                    //          слова пользовательской программы
         reg_IP = 256;               // будет выполнена самая первая инструкция
         reg_SP = `MEMMORY_LIMIT;    // прочитать со стека ничего нельзя, записать можно
                                     // значение регистров FP и RV не определено
@@ -760,20 +786,23 @@ module main;
             // $write(" ...\n");
 
             // проверка на валидность значения регистра IP
-            if (!(256 <= reg_IP && reg_IP < (256 + labelsValuesArray[0]))) begin
-                $write("RuntimeError: register IP must be between 256 and %d.", (256 + labelsValuesArray[0]));
+            if (!(256 <= reg_IP && reg_IP < (256 + program_size))) begin
+                $write("RuntimeError: register IP must be between 256 and %d.",
+                                                            (256 + program_size));
                 $write(" Your register IP - %d.\n", reg_IP);
                 $finish(1);
             end
             // проверка на переполненность стека ;)
-            if (!((256 + labelsValuesArray[0]) <= reg_SP)) begin
+            if (!((256 + program_size) <= reg_SP)) begin
                 $write("RuntimeError: line~%d: stack overflow.\n", (reg_IP - 256));
                 $finish(1);
             end
-            // проверка на валидность значения регистра SP (по идее, никогда не пригодится, достаточно прочих проверок)
+            // проверка на валидность значения регистра SP
+            //      (по идее, никогда не пригодится, достаточно прочих проверок)
             if (!(reg_SP <= `MEMMORY_LIMIT)) begin
-                $write("RuntimeError: line~%d: register SP must be between", (reg_IP - 256));
-                $write(" %d and %d.", (256 + labelsValuesArray[0]), `MEMMORY_LIMIT);
+                $write("RuntimeError: line~%d: register SP must be between",
+                                                                (reg_IP - 256));
+                $write(" %d and %d.", (256 + program_size), `MEMMORY_LIMIT);
                 $write(" Your register SP - %d.\n", reg_SP);
                 $finish(1);
             end
@@ -782,9 +811,11 @@ module main;
             case (memmory[reg_IP])
 
                 CMD_ADD : begin
-                    // проверка на возможность считывания нужного количества слов со стека
+                    // проверка на возможность считывания
+                    //      нужного количества слов со стека
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "ADD", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "ADD", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -799,7 +830,8 @@ module main;
 
                 CMD_SUB : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "SUB", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "SUB", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -811,7 +843,8 @@ module main;
 
                 CMD_MUL : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "MUL", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "MUL", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -823,7 +856,8 @@ module main;
 
                 CMD_DIV : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "DIV", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "DIV", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -831,7 +865,8 @@ module main;
                     x = memmory[reg_SP++];
 
                     if (y == 0) begin
-                        $write("RuntimeError: line~%d: Division by zero.\n", (reg_IP - 256));
+                        $write("RuntimeError: line~%d: Division by zero.\n",
+                                                                (reg_IP - 256));
                         $finish(1);
                     end
 
@@ -841,7 +876,8 @@ module main;
 
                 CMD_MOD : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "MOD", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "MOD", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -849,7 +885,8 @@ module main;
                     x = memmory[reg_SP++];
 
                     if (y == 0) begin
-                        $write("RuntimeError: line~%d: Division by zero.\n", (reg_IP - 256));
+                        $write("RuntimeError: line~%d: Division by zero.\n",
+                                                                (reg_IP - 256));
                         $finish(1);
                     end
 
@@ -859,7 +896,8 @@ module main;
 
                 CMD_NEG : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "NEG", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "NEG", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -870,7 +908,8 @@ module main;
 
                 CMD_BITAND : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "BITAND", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "BITAND", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -882,7 +921,8 @@ module main;
 
                 CMD_BITOR : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "BITOR", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "BITOR", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -894,7 +934,8 @@ module main;
 
                 CMD_BITNOT : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "BITNOT", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "BITNOT", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -905,7 +946,8 @@ module main;
 
                 CMD_LSHIFT : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "LSHIFT", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "LSHIFT", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -917,7 +959,8 @@ module main;
 
                 CMD_RSHIFT : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "RSHIFT", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "RSHIFT", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -929,7 +972,8 @@ module main;
 
                 CMD_DUP : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "DUP", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "DUP", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -941,7 +985,8 @@ module main;
 
                 CMD_DROP : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "DROP", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "DROP", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -951,7 +996,8 @@ module main;
 
                 CMD_SWAP : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "SWAP", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "SWAP", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -964,7 +1010,8 @@ module main;
 
                 CMD_ROT : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 3) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "ROT", 3, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "ROT", 3, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -979,7 +1026,8 @@ module main;
 
                 CMD_OVER : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "OVER", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "OVER", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -993,11 +1041,14 @@ module main;
 
                 CMD_DROPN : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "DROPN", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "DROPN", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
                     if ((`MEMMORY_LIMIT - reg_SP) < memmory[reg_SP] + 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "DROPN", (memmory[reg_SP] + 1), (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "DROPN", (memmory[reg_SP] + 1),
+                                (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1007,7 +1058,8 @@ module main;
 
                 CMD_PUSHN : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "PUSHN", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "PUSHN", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1017,14 +1069,16 @@ module main;
 
                 CMD_LOAD : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "LOAD", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "LOAD", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
                     a = memmory[reg_SP++];
 
                     if (!(256 <= a && a <= `MEMMORY_LIMIT)) begin
-                        $write("RuntimeError: line~%d: LOAD: memmory adress must be between", (reg_IP - 256));
+                        $write(
+"RuntimeError: line~%d: LOAD: memmory adress must be between", (reg_IP - 256));
                         $write(" 256 and %d.", `MEMMORY_LIMIT);
                         $write(" Your request adress - %d.\n", a);
                         $finish(1);
@@ -1036,16 +1090,18 @@ module main;
 
                 CMD_SAVE : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "SAVE", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "SAVE", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
                     v = memmory[reg_SP++];
                     a = memmory[reg_SP++];
 
-                    if (!(256 + labelsValuesArray[0] <= a && a <= `MEMMORY_LIMIT)) begin
-                        $write("RuntimeError: line~%d: SAVE: memmory adress must be between", (reg_IP - 256));
-                        $write(" %d and %d.", 256 + labelsValuesArray[0], `MEMMORY_LIMIT);
+                    if (!(256 + program_size <= a && a <= `MEMMORY_LIMIT)) begin
+                        $write("RuntimeError: line~%d: SAVE:\
+memmory adress must be between", (reg_IP - 256));
+                        $write(" %d and %d.", 256 + program_size, `MEMMORY_LIMIT);
                         $write(" Your request adress - %d.\n", a);
                         $write("[ you cant rewrite your executing program ;) ].\n");
                         $finish(1);
@@ -1061,7 +1117,8 @@ module main;
 
                 CMD_SETIP : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "SETIP", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "SETIP", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1075,15 +1132,18 @@ module main;
 
                 CMD_SETSP : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "SETSP", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "SETSP", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
                     reg_SP = memmory[reg_SP++];
 
-                    if (!(256 + labelsValuesArray[0] <= reg_SP && reg_SP <= `MEMMORY_LIMIT)) begin
-                        $write("RuntimeError: line~%d: SETSP: value of register SP");
-                        $write(" between %d and %d.", 256 + labelsValuesArray[0], `MEMMORY_LIMIT);
+                    if (!(256 + program_size <= reg_SP &&
+                                                reg_SP <= `MEMMORY_LIMIT)) begin
+                        $write("RuntimeError: line~%d: SETSP: value of register");
+                        $write(" SP must be between %d and %d.",
+                                256 + program_size, `MEMMORY_LIMIT);
                         $write("But register SP was set with %s.\n", reg_SP);
                         $finish(1);
                     end
@@ -1098,7 +1158,8 @@ module main;
 
                 CMD_SETFP : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "SETFP", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "SETFP", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1113,7 +1174,8 @@ module main;
 
                 CMD_SETRV : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "SETRV", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "SETRV", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1123,7 +1185,8 @@ module main;
 
                 CMD_CMP : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "CMP", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "CMP", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1143,7 +1206,8 @@ module main;
 
                 CMD_JMP : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "JMP", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "JMP", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1152,7 +1216,8 @@ module main;
 
                 CMD_JLT : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "JLT", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "JLT", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1163,7 +1228,8 @@ module main;
 
                 CMD_JGT : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "JGT", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "JGT", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1174,7 +1240,8 @@ module main;
 
                 CMD_JEQ : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "JEQ", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "JEQ", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1185,7 +1252,8 @@ module main;
 
                 CMD_JLE : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "JLE", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "JLE", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1196,7 +1264,8 @@ module main;
 
                 CMD_JGE : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "JGE", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "JGE", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1207,7 +1276,8 @@ module main;
 
                 CMD_JNE : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "JNE", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "JNE", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1218,7 +1288,8 @@ module main;
 
                 CMD_CALL : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "CALL", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "CALL", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1229,11 +1300,14 @@ module main;
 
                 CMD_RETN : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "RETN", 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "RETN", 2, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
                     if ((`MEMMORY_LIMIT - reg_SP) < memmory[reg_SP] + 2) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "RETN", memmory[reg_SP] + 2, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "RETN", memmory[reg_SP] + 2,
+                                (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1251,7 +1325,8 @@ module main;
 
                 CMD_OUT : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "OUT", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "OUT", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1262,7 +1337,8 @@ module main;
                     
                 CMD_HALT : begin
                     if ((`MEMMORY_LIMIT - reg_SP) < 1) begin
-                        $write(STACK_ERROR, (reg_IP - 256), "HALT", 1, (`MEMMORY_LIMIT - reg_SP));
+                        $write(STACK_ERROR, (reg_IP - 256),
+                                "HALT", 1, (`MEMMORY_LIMIT - reg_SP));
                         $finish(1);
                     end
 
@@ -1273,10 +1349,13 @@ module main;
                 end
 
                 default : begin
-                    if (memmory[reg_IP] >= 0) begin  // неотрицательное число помещаем на вершину стека
+                                                     // неотрицательное число
+                    if (memmory[reg_IP] >= 0) begin  // помещаем на вершину стека
                         memmory[--reg_SP] = memmory[reg_IP++];
-                    end else begin  // ошибка, если слово не распознано ни как интсрукция, ни как неотрицательное число
-                        $write("RuntimeError: line~%d: Unknown command - '%d'.\n", (reg_SP - 256), memmory[reg_IP]);
+                                   // ошибка, если слово не распознано ни как
+                    end else begin // интсрукция, ни как неотрицательное число
+                        $write("RuntimeError: line~%d: Unknown command - '%d'.\n",
+                                            (reg_SP - 256), memmory[reg_IP]);
                         $finish(1);
                     end
                 end
