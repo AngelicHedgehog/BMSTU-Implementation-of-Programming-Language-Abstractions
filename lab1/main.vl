@@ -7,7 +7,7 @@
 module main;
     // имена файлов
     localparam targerProgramFile    = "lab1.asm";
-    localparam stdinFile            = "lab1.txt";
+    localparam stdinFile            = "stdin.txt";
 
     // лексемы
     reg [7:0]   lexemsArray[0:`MAX_LEXEM_COUNT-1][0:`MAX_LEXEM_SIZE-1];
@@ -548,7 +548,7 @@ be at least %d element, but %d found.\n";
         ++labelsCount;
 
 
-        // <<<<<===== второй этап - лексинг =====>>>>>
+        // <<<<<===== второй этап - анализ (проходы) и исполнение =====>>>>>
 
         // первый проход ==========>
         current = 256;  // указание
@@ -778,12 +778,12 @@ be at least %d element, but %d found.\n";
 
         // главный исполняющий цикл машины
         forever begin
-            // // <<<<<======= ДЕБАГ: печать выполняемой команды и состояния стека
-            // $write("%d | ", memmory[reg_IP]);
-            // for (k = `MEMMORY_LIMIT - 1; k != reg_SP - 1; --k) begin
-            //     $write("%d ", memmory[k]);
-            // end
-            // $write(" ...\n");
+            // <<<<<======= ДЕБАГ: печать выполняемой команды и состояния стека
+            $write("lexem~%d\tcmd=%d | ", (reg_IP - 256), memmory[reg_IP]);
+            for (k = `MEMMORY_LIMIT - 1; k != reg_SP - 1; --k) begin
+                $write("%d ", memmory[k]);
+            end
+            $write(" ...\n");
 
             // проверка на валидность значения регистра IP
             if (!(256 <= reg_IP && reg_IP < (256 + program_size))) begin
@@ -1112,7 +1112,7 @@ memmory adress must be between", (reg_IP - 256));
                 end
 
                 CMD_GETIP : begin
-                    memmory[--reg_SP] = ++reg_IP;
+                    memmory[--reg_SP] = reg_IP++;
                 end
 
                 CMD_SETIP : begin

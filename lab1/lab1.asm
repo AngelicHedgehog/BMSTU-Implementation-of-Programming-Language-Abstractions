@@ -7,8 +7,8 @@ HALT
     :loop
         IN                                  ; ret wordCount isWord char
 
-        DUP 10 CMP loop_exit JEQ            ; loop exit if 10 ('\n')
-        DUP 13 CMP loop_exit JEQ            ; loop exit if 13 ('\r')
+        DUP 10 CMP loop_exit JEQ            ; loop exit if '\n'
+        DUP 13 CMP loop_exit JEQ            ; loop exit if '\r'
 
         DUP 32 CMP not_space JEQ            ; skip if ' '
         DUP 9 CMP not_space JEQ             ; skip if '\t'
@@ -24,10 +24,10 @@ HALT
                 1                           ; ret wordCount+1 isWord=1
             :not_first_char
                 if_exit JMP
-        :not_space
+        :not_space                          ; ret wordCount isWord
             2 DROPN                         ; ret wordCount
             0                               ; ret wordCount isWord=0
-        :if_exit
+        :if_exit                            ; ret wordCount isWord
 
         loop JMP
     :loop_exit                              ; ret wordCount isWord char
@@ -51,5 +51,3 @@ write_int CALL  ; ret x%10
 DROP            ; ret x%10
 48 ADD OUT      ; ret
 0 RETN          ; пусто
-
-
