@@ -1,1 +1,49 @@
-$ENTRY Go {=}
+$ENTRY Go {
+    = <GetParam>;
+}
+
+ctoi {
+    s.Char = <Sub <Ord s.Char> <Ord '0'>>
+}
+
+atoi {
+    e.Other s.PreLast s.Last = <Add <Mul <atoi e.Other s.PreLast> 10> <ctoi s.Last>>;
+    s.Once                   = <ctoi s.Once>;
+}
+
+GetParam {
+    , <Arg 1> : {
+        '-' e.LineCount = <PrintNextFile <atoi e.LineCount> 2>;
+        e.Else          = <PrintNextFile 10          1>;
+    };
+}
+
+PrintNextFile {
+    s.LineCount s.ArgIndex
+    , <Arg s.ArgIndex> : {
+        ''         = ;
+        e.ArgValue =
+            <Prout <Open 'r' 1 e.ArgValue>>
+            <PrintFirstFileLines 1 s.LineCount>
+            <Close 1>
+            <PrintNextFile s.LineCount <Add s.ArgIndex 1>>
+    };
+}
+
+PrintFirstFileLines {
+    s.FileNo 0 = ;
+    s.FileNo s.LineCount
+    , <Get s.FileNo> : {
+        e.FileLine s.LastSym
+        , <Compare <Ord s.LastSym> 0> : {
+            '+'     = 
+                <Prout e.FileLine s.LastSym>
+                <PrintFirstFileLines s.FileNo <Sub s.LineCount 1>>;
+            e.Else  =
+                <Prout e.FileLine>;
+        };
+        e.EmptyLine =
+            <Prout>
+            <PrintFirstFileLines s.FileNo <Sub s.LineCount 1>>;
+    };
+}
