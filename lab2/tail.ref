@@ -1,83 +1,23 @@
+$EXTERN LoadFile, Int, Dec, ArgList, Map, DelAccumulator, UnionTerms, atoi;
+
 $ENTRY Go {
-    = <GetParam>;
+    /* пусто */ = <Main <ArgList>>;
 }
 
-ctoi {
-    s.Char
-    , <Sub <Ord s.Char> <Ord '0'>> : s.Dig
-    , <Compare s.Dig 0> : {
-        '-' =
-            <Putout 0 "Error: ctoi: digit must be between 0 and 9.">
-            <Exit 1>;
-        e._
-        , <Compare s.Dig 9> : {
-            '+' =
-                <Putout 0 "Error: ctoi: digit must be between 0 and 9.">
-                <Exit 1>;
-            e._ = s.Dig;
-        };
-    };
+Main {
+    (e.ProgPath) ('-' e.LinesCount) e.Files
+        , <atoi e.LinesCount> : s.LinesCount
+        , e.Files : {
+            /* пусто */ = (<LoadFile 0>);
+            e._ = <Map LoadFile e.Files>;
+        } : e.FileLines
+        = 
+            <Map Prout <UnionTerms
+                <Map DelAccumulator
+                    <Map (Last s.LinesCount) e.FileLines>>>>;
+
+    (e.ProgPath) e.Files = <Main (e.ProgPath) ('-10') e.Files>;
     e._ =
-        <Putout 0 "Error: ctoi: wrong arguments count.">
-        <Exit 1>;
-}
-
-atoi {
-    e.Other s.PreLast s.Last = <Add <Mul <atoi e.Other s.PreLast> 10> <ctoi s.Last>>;
-    s.Once                   = <ctoi s.Once>;
-    e.Nothing =
-        <Putout 0 "Error: atoi: integer must have at least one digit.">
-        <Exit 1>;
-}
-
-GetParam {
-    , <Arg 1> : {
-        '-' e.LineCount = <PrintNextFile <atoi e.LineCount> 2>;
-        e.FirstFile     = <PrintNextFile 10 1>;
-    };
-    e._ =
-        <Putout 0 "Error: GetParam: wrong arguments count.">
-        <Exit 1>;
-}
-
-PrintNextFile {
-    s.LineCount s.ArgIndex
-    , <Arg s.ArgIndex> : {
-        ''         = ;
-        e.ArgValue
-        , <ExistFile e.ArgValue> : {
-            False = 
-                <Putout 0 "Error: PrintNextFile: file \"" e.ArgValue "\" unexists.">
-                <Exit 1>;
-            True =
-                <Prout <Open 'r' 1 e.ArgValue>>
-                <PrintFirstFileLines 1 s.LineCount>
-                <Close 1>
-                <PrintNextFile s.LineCount <Add s.ArgIndex 1>>;
-        };
-    };
-    e._ =
-        <Putout 0 "Error: PrintNextFile: wrong argument count.">
-        <Exit 1>;
-}
-
-PrintFirstFileLines {
-    s.FileNo 0 = ;
-    s.FileNo s.LineCount
-    , <Get s.FileNo> : {
-        e.FileLine s.LastSym
-        , <Compare <Ord s.LastSym> 0> : {
-            '+'     = 
-                <Prout e.FileLine s.LastSym>
-                <PrintFirstFileLines s.FileNo <Sub s.LineCount 1>>;
-            e.FileLastLine  =
-                <Prout e.FileLine>;
-        };
-        e.EmptyLine =
-            <Prout>
-            <PrintFirstFileLines s.FileNo <Sub s.LineCount 1>>;
-    };
-    e._ =
-        <Putout 0 "Error: PrintFirstFileLines: wrong argument count.">
+        <Putout 0 "Error: Main: wrong arguments format.">
         <Exit 1>;
 }
