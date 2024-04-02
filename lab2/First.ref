@@ -1,1 +1,52 @@
-$ENTRY Go {=}
+$ENTRY Go {
+    = <Prout <First ('a' '⋃' 'a' '·' 'c') '*' '·' 'b'>>;
+}
+
+IsIn {
+    e.Element (e.Left e.Element e.Right) = True;
+    e.Else = False;
+}
+
+AddToSet {
+    'ε' (e.SetLeft 'ε' e.SetRight) =
+        e.SetLeft 'ε' e.SetRight;
+    'ε' (e.Set) = 'ε' e.Set;
+
+    s.Element (e.SetLeft s.Element e.SetRight) =
+        e.SetLeft s.Element e.SetRight;
+    s.Element (e.Set) = s.Element e.Set;
+
+    e.Else = <Prout 'Error AddToSet: ' e.Else>;
+}
+
+UnionSets {
+    (e.Set) () = e.Set;
+    () (e.Set) = e.Set;
+
+    (e.Set1Left s.Set2First e.Set1Right) (s.Set2First e.Set2Other) =
+        <UnionSets (e.Set1Left s.Set2First e.Set1Right) (e.Set2Other)>;
+    (e.Set1) (s.Set2First e.Set2Other) =
+        <UnionSets (e.Set1 s.Set2First) (e.Set2Other)>;
+
+    e.Else = <Prout 'Error UnionSets: ' e.Else>;
+}
+
+First {
+    (e.RegEx)   = <First e.RegEx>;
+
+    '∅'         = ;
+    'ε'         = 'ε';
+    s.RegEx     =  s.RegEx;
+    t.RegEx '*' = <AddToSet 'ε' (<First t.RegEx>)>;
+
+    t.RegExL '⋃' t.RegExR =
+        <UnionSets (<First t.RegExL>) (<First t.RegExR>)>;
+    e.RegExL '·' e.RegExR
+    , <First e.RegExL> : e.FirstL
+    , <IsIn 'ε' (e.FirstL)> : {
+        True  = <UnionSets (e.FirstL) (<First e.RegExR>)>;
+        False = e.FirstL;
+    };
+
+    e.Else = <Prout 'Error First: ' e.Else>;
+}
