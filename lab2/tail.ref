@@ -1,4 +1,4 @@
-$EXTERN LoadFile, Int, Dec, ArgList, Map, DelAccumulator, UnionTerms, atoi;
+$EXTERN LoadFile, ArgList, Map, DelAccumulator;
 
 $ENTRY Go {
     /* пусто */ = <Main <ArgList>>;
@@ -9,15 +9,46 @@ Main {
         , <atoi e.LinesCount> : s.LinesCount
         , e.Files : {
             /* пусто */ = (<LoadFile 0>);
-            e._ = <Map LoadFile e.Files>;
-        } : e.FileLines
+            e._ = <Map {e.File = (<LoadFile e.File>);} e.Files>;
+        } : e.FilesLines
         = 
-            <Map Prout <UnionTerms
-                <Map DelAccumulator
-                    <Map (Last s.LinesCount) e.FileLines>>>>;
+            <Map {
+                e.FileLines =
+                    <Map Prout <DelAccumulator
+                        <Last s.LinesCount e.FileLines>>>;
+            } e.FilesLines>;
 
     (e.ProgPath) e.Files = <Main (e.ProgPath) ('-10') e.Files>;
     e._ =
         <Putout 0 "Error: Main: wrong arguments format.">
         <Exit 1>;
 }
+
+$ENTRY ctoi {
+    s.Char
+        , <Sub <Ord s.Char> <Ord '0'>> : s.Digit
+        , <Compare s.Digit 0> : {
+            '-' =
+                <Putout 0 "Error: ctoi: digit must be between 0 and 9.">
+                <Exit 1>;
+            e._
+                , <Compare s.Digit 9> : {
+                    '+' =
+                        <Putout 0 "Error: ctoi: digit must be between 0 and 9.">
+                        <Exit 1>;
+                    e._ = s.Digit;
+                };
+        };
+    e._ =
+        <Putout 0 "Error: ctoi: wrong arguments format.">
+        <Exit 1>;
+}
+
+$ENTRY atoi {
+    e.Other s.PreLast s.Last = <Add <Mul <atoi e.Other s.PreLast> 10> <ctoi s.Last>>;
+    s.Once                   = <ctoi s.Once>;
+    e.Nothing =
+        <Putout 0 "Error: atoi: integer must have at least one digit.">
+        <Exit 1>;
+}
+

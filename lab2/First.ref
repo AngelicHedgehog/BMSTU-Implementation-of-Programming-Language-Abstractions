@@ -42,11 +42,11 @@ First {
     t.RegExL '⋃' t.RegExR =
         <UnionSets (<First t.RegExL>) (<First t.RegExR>)>;
     e.RegExL '·' e.RegExR
-    , <First e.RegExL> : e.FirstL
-    , <IsIn 'ε' (e.FirstL)> : {
-        True  = <UnionSets (e.FirstL) (<First e.RegExR>)>;
-        False = e.FirstL;
-    };
+        , <First e.RegExL> : e.FirstL
+        , <IsIn 'ε' (e.FirstL)> : {
+            True  = <UnionSets (e.FirstL) (<First e.RegExR>)>;
+            False = e.FirstL;
+        };
 
     e.Else = <Prout 'Error First: ' e.Else>;
 }

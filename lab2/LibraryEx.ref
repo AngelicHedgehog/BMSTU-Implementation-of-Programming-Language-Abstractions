@@ -20,21 +20,6 @@ $ENTRY LoadFile {
         };
 }
 
-$ENTRY Inc {
-    s.Integer = <Add s.Integer 1>;
-    e._ =
-        <Putout 0 "Error: Inc: wrong arguments format.">
-        <Exit 1>;
-}
-
-
-$ENTRY Dec {
-    s.Integer = <Sub s.Integer 1>;
-    e._ =
-        <Putout 0 "Error: Dec: wrong arguments format.">
-        <Exit 1>;
-}
-
 $ENTRY ArgList {
     /* пусто */ = <ArgList 0>;
     s.ArgIndex
@@ -50,7 +35,7 @@ $ENTRY ArgList {
 $ENTRY Map {
     (t.Closure e.FirstArgs) = /* пусто */;
     (t.Closure e.FirstArgs) (e.Arg) e.Args =
-        (<Mu t.Closure e.FirstArgs e.Arg>)
+        <Mu t.Closure e.FirstArgs e.Arg>
         <Map (t.Closure e.FirstArgs) e.Args>;
     (t.Closure e.FirstArgs) t.Arg e.Args =
         <Map (t.Closure e.FirstArgs) (t.Arg) e.Args>;
@@ -64,41 +49,5 @@ $ENTRY DelAccumulator {
     t.Accum e.AnyExpr = e.AnyExpr;
     e._ =
         <Putout 0 "Error: DelAccumulator: wrong arguments format.">
-        <Exit 1>;
-}
-
-$ENTRY UnionTerms {
-    /* пусто */ = ;
-    (e.First) e.Other = e.First <UnionTerms e.Other>;
-    e._ =
-        <Putout 0 "Error: UnionTerms: wrong arguments format.">
-        <Exit 1>;
-}
-
-$ENTRY ctoi {
-    s.Char
-        , <Sub <Ord s.Char> <Ord '0'>> : s.Digit
-        , <Compare s.Digit 0> : {
-            '-' =
-                <Putout 0 "Error: ctoi: digit must be between 0 and 9.">
-                <Exit 1>;
-            e._
-                , <Compare s.Digit 9> : {
-                    '+' =
-                        <Putout 0 "Error: ctoi: digit must be between 0 and 9.">
-                        <Exit 1>;
-                    e._ = s.Digit;
-                };
-        };
-    e._ =
-        <Putout 0 "Error: ctoi: wrong arguments format.">
-        <Exit 1>;
-}
-
-$ENTRY atoi {
-    e.Other s.PreLast s.Last = <Add <Mul <atoi e.Other s.PreLast> 10> <ctoi s.Last>>;
-    s.Once                   = <ctoi s.Once>;
-    e.Nothing =
-        <Putout 0 "Error: atoi: integer must have at least one digit.">
         <Exit 1>;
 }
