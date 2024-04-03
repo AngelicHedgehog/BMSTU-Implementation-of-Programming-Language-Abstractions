@@ -27,17 +27,11 @@ Main {
 $ENTRY ctoi {
     s.Char
         , <Sub <Ord s.Char> <Ord '0'>> : s.Digit
-        , <Compare s.Digit 0> : {
-            '-' =
+        , <Compare s.Digit <Sub 0 1>> <Compare s.Digit 10> : {
+            '+-' = s.Digit;
+            e._ = 
                 <Putout 0 "Error: ctoi: digit must be between 0 and 9.">
                 <Exit 1>;
-            e._
-                , <Compare s.Digit 9> : {
-                    '+' =
-                        <Putout 0 "Error: ctoi: digit must be between 0 and 9.">
-                        <Exit 1>;
-                    e._ = s.Digit;
-                };
         };
     e._ =
         <Putout 0 "Error: ctoi: wrong arguments format.">
