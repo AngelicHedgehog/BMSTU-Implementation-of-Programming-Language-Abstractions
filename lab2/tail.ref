@@ -42,7 +42,7 @@ $ENTRY atoi {
     e.Other s.PreLast s.Last = <Add <Mul <atoi e.Other s.PreLast> 10> <ctoi s.Last>>;
     s.Once                   = <ctoi s.Once>;
     e._ =
-        <Putout 0 "Error: ctoi: wrong arguments format.">
+        <Putout 0 "Error: atoi: wrong arguments format.">
         <Exit 1>;
 }
 
