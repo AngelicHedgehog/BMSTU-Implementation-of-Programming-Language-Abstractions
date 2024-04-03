@@ -41,8 +41,8 @@ $ENTRY ctoi {
 $ENTRY atoi {
     e.Other s.PreLast s.Last = <Add <Mul <atoi e.Other s.PreLast> 10> <ctoi s.Last>>;
     s.Once                   = <ctoi s.Once>;
-    e.Nothing =
-        <Putout 0 "Error: atoi: integer must have at least one digit.">
+    e._ =
+        <Putout 0 "Error: ctoi: wrong arguments format.">
         <Exit 1>;
 }
 
