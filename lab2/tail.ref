@@ -9,7 +9,7 @@ Main {
     (e.ProgPath) ('-' e.LinesCount) e.Files
         , <atoi e.LinesCount> : s.LinesCount
         , e.Files : {
-            /* пусто */ = (<LoadStdin>);
+            /* пусто */ = (() <LoadStdin>);
             e._ = <Map {(e.File) = ((e.File) <LoadFile e.File>);} e.Files>;
         } : e.FilesLines
         , e.FilesLines : {
