@@ -1,0 +1,8 @@
+$EXTERN ConstExpr;
+
+/**
+  <Init "=" t.ConstExpr*> == s.AsmCodeCmd*
+*/
+$ENTRY Init {
+    "=" e.ConstExprs = /* пусто */;
+}

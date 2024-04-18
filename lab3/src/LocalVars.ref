@@ -1,0 +1,8 @@
+$EXTERN Name, ConstExpr;
+
+/**
+  <LocalVars (var (s.Name t.ConstExpr)*)> == s.AsmCodeCmd*
+*/
+$ENTRY LocalVars {
+    ("var" e.NamesConstExprs) = /* пусто */;
+}

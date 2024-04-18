@@ -1,0 +1,11 @@
+$EXTERN Definition
+
+/**
+  <Program t.Definition*> == s.AsmCodeCmd*
+*/
+$ENTRY Program {
+    t.Definition e.Definitions
+        =   <Definition t.Definition>
+            <Program e.Definitions>
+    /* пусто */ = /* пусто */;
+}

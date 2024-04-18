@@ -1,0 +1,24 @@
+$EXTERN Expr, BoolExpr, Code;
+
+/**
+  <Statement
+      (t.Expr "=" t.Expr)
+    | (call t.Expr t.Expr*)
+    | (return t.Expr)
+    | (if t.BoolExpr e.Code)
+    | (if t.BoolExpr e.Code else e.Code)
+    | (while t.BoolExpr e.Code)
+    | (asm s.ANY+)
+  > == s.AsmCodeCmd*
+*/
+$ENTRY Statement {
+    ("call" t.Expr) = /* пусто */;
+    ("call" t.Expr e.Exprs) = /* пусто */;
+    ("return" t.Expr) = /* пусто */;
+    ("if" t.BoolExpr e.Code "else" e.Code) = /* пусто */;
+    ("if" t.BoolExpr e.Code) = /* пусто */;
+    ("whie" t.BoolExpr e.Code) = /* пусто */;
+    ("asm" s.ANY) = /* пусто */;
+    ("asm" s.ANY e.ANYs) = /* пусто */;
+    (t.Expr "=" t.Expr) = /* пусто */;
+}

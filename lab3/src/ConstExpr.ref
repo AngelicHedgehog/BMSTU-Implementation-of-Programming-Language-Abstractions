@@ -1,0 +1,16 @@
+$EXTERN Name, ConstExprm, BinOp;
+
+/**
+  <ConstExpr
+      s.Name
+    | s.NUMBER
+    | ("-" t.ConstExpr)
+    | (t.ConstExpr s.BinOp t.ConstExpr)
+  > == s.AsmCodeCmd*
+*/
+$ENTRY {
+    s.Name = /* пусто */;
+    s.NUMBER = /* пусто */;
+    ("-" t.ConstExpr) = /* пусто */;
+    (t.ConstExpr s.BinOp t.ConstExpr) = /* пусто */;
+}

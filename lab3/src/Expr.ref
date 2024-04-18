@@ -1,0 +1,23 @@
+$EXTERN Name, Expr, BinOp;
+
+/**
+  <Expr
+      s.Name
+    | s.NUMBER
+    | (L t.Expr)
+    | ("-" t.Expr)
+    | (t.Expr s.BinOp t.Expr)
+    | (call t.Expr t.Expr*)
+    | (asm s.ANY+)
+  > == s.AsmCodeCmd*
+*/
+$ENTRY Expr {
+    s.Name = /* пусто */;
+    s.NUMBER = /* пусто */;
+    ("L" t.Expr) = /* пусто */;
+    ("-" t.Expr) = /* пусто */;
+    ("call" t.Expr) = /* пусто */;
+    ("call" t.Expr e.Exprs) = /* пусто */;
+    ("asm" s.ANY) = /* пусто */;
+    ("asm" s.ANY e.ANYS) = /* пусто */;
+}

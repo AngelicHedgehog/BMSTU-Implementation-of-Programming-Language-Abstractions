@@ -1,0 +1,19 @@
+$EXTERN Expr, RelOp;
+
+/**
+  <BoolExpr
+      TRUE | FALSE
+    | (t.Expr s.RelOp t.Expr)
+    | (not t.BoolExpr)
+    | (t.BoolExpr and t.BoolExpr)
+    | (t.BoolExpr or t.BoolExpr)
+  > == s.AsmCodeCmd*
+*/
+$ENTRY BoolExpr {
+    "TRUE" = /* пусто */;
+    "FALSE" = /* пусто */;
+    ("not" t.BoolExpr) = /* пусто */;
+    (t.BoolExpr "and" t.BoolExpr) = /* пусто */;
+    (t.BoolExpr "or" t.BoolExpr) = /* пусто */;
+    (t.Expr s.RelOp t.Expr) = /* пусто */;
+}

@@ -1,0 +1,6 @@
+*$FROM LibraryEx
+$EXTERN LoadExpr;
+
+$ENTRY Go {
+     = <Prout (<LoadExpr <Arg 1>>)>;
+}

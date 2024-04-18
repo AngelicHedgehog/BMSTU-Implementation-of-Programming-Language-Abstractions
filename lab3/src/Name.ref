@@ -1,0 +1,6 @@
+/**
+  <Name s.WORD> == s.WORD
+*/
+$ENTRY Name {
+    s.WORD = s.WORD;
+}

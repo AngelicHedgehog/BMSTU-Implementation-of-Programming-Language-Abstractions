@@ -1,0 +1,8 @@
+$EXTERN Name, ConstExpr;
+
+/**
+  <Struct (struct s.Name (s.Name t.ConstExpr)*)> == s.AsmCodeCmd*
+*/
+$ENTRY Struct {
+    ("struct" s.Name e.NamesConstExprs) = /* пусто */;
+}
