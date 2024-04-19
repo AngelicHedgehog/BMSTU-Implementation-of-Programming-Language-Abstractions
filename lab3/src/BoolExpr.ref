@@ -10,10 +10,10 @@ $EXTERN Expr, RelOp;
   > == s.AsmCodeCmd*
 */
 $ENTRY BoolExpr {
-    "TRUE" = /* пусто */;
-    "FALSE" = /* пусто */;
-    ("not" t.BoolExpr) = /* пусто */;
-    (t.BoolExpr "and" t.BoolExpr) = /* пусто */;
-    (t.BoolExpr "or" t.BoolExpr) = /* пусто */;
+    TRUE = /* пусто */;
+    FALSE = /* пусто */;
+    (not t.BoolExpr) = /* пусто */;
+    (t.BoolExpr and t.BoolExpr) = /* пусто */;
+    (t.BoolExpr or t.BoolExpr) = /* пусто */;
     (t.Expr s.RelOp t.Expr) = /* пусто */;
 }

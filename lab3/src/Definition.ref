@@ -4,8 +4,8 @@ $EXTERN Struct, Const, GlobalVal, Function
   <Definition t.Struct | t.Const | t.GlobalVar | t.Function> == s.AsmCodeCmd*
 */
 $ENTRY Definition {
-    ("struct" e.Struct) = <Struct ("struct" e.Struct)>
-    ("const" e.Const) = <Const ("const" e.Const)>
-    ("var" e.GlobalVal) = <GlobalVal ("var" e.GlobalVal)>
-    ("function" e.Function) = <Function ("function" e.Function)>
+    (struct e.Struct) = <Struct (struct e.Struct)>
+    (const e.Const) = <Const (const e.Const)>
+    (var e.GlobalVal) = <GlobalVal (var e.GlobalVal)>
+    (function e.Function) = <Function (function e.Function)>
 }

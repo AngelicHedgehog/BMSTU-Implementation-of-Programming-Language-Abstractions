@@ -4,5 +4,5 @@ $EXTERN Name, ConstExpr;
   <Const (const s.Name "=" t.ConstExpr)> == s.AsmCodeCmd*
 */
 $ENTRY Const {
-    ("const" s.Name "=" t.ConstExpr) = /* пусто */;
+    (const s.Name "=" t.ConstExpr) = /* пусто */;
 }

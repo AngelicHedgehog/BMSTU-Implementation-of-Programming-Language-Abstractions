@@ -14,10 +14,10 @@ $EXTERN Name, Expr, BinOp;
 $ENTRY Expr {
     s.Name = /* пусто */;
     s.NUMBER = /* пусто */;
-    ("L" t.Expr) = /* пусто */;
+    (L t.Expr) = /* пусто */;
     ("-" t.Expr) = /* пусто */;
-    ("call" t.Expr) = /* пусто */;
-    ("call" t.Expr e.Exprs) = /* пусто */;
-    ("asm" s.ANY) = /* пусто */;
-    ("asm" s.ANY e.ANYS) = /* пусто */;
+    (call t.Expr) = /* пусто */;
+    (call t.Expr e.Exprs) = /* пусто */;
+    (asm s.ANY) = /* пусто */;
+    (asm s.ANY e.ANYS) = /* пусто */;
 }

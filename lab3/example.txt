@@ -1,0 +1,4 @@
+(var Counter 1)
+(var Items 5 "=" 1 2 3 4 5)
+(var rising Line "=" 0 0 10 10)
+(var result_array 4)

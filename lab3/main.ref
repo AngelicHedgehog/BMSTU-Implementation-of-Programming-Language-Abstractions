@@ -2,5 +2,5 @@
 $EXTERN LoadExpr;
 
 $ENTRY Go {
-     = <Prout (<LoadExpr <Arg 1>>)>;
+     /* пусто */ = <Prout <LoadExpr <Arg 1>>>;
 }

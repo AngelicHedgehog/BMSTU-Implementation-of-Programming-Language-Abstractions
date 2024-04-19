@@ -4,6 +4,6 @@ $EXTERN Name, ConstExpr, Init;
   <GlobalVar (var s.Name t.ConstExpr e.Init?)> == s.AsmCodeCmd*
 */
 $ENTRY GlobalVar {
-    ("var" s.Name t.ConstExpr) = /* пусто */;
-    ("var" s.Name t.ConstExpr e.Init) = /* пусто */;
+    (var s.Name t.ConstExpr) = /* пусто */;
+    (var s.Name t.ConstExpr e.Init) = /* пусто */;
 }

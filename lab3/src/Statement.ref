@@ -12,13 +12,13 @@ $EXTERN Expr, BoolExpr, Code;
   > == s.AsmCodeCmd*
 */
 $ENTRY Statement {
-    ("call" t.Expr) = /* пусто */;
-    ("call" t.Expr e.Exprs) = /* пусто */;
-    ("return" t.Expr) = /* пусто */;
-    ("if" t.BoolExpr e.Code "else" e.Code) = /* пусто */;
-    ("if" t.BoolExpr e.Code) = /* пусто */;
-    ("whie" t.BoolExpr e.Code) = /* пусто */;
-    ("asm" s.ANY) = /* пусто */;
-    ("asm" s.ANY e.ANYs) = /* пусто */;
+    (call t.Expr) = /* пусто */;
+    (call t.Expr e.Exprs) = /* пусто */;
+    (return t.Expr) = /* пусто */;
+    (if t.BoolExpr e.Code else e.Code) = /* пусто */;
+    (if t.BoolExpr e.Code) = /* пусто */;
+    (whie t.BoolExpr e.Code) = /* пусто */;
+    (asm s.ANY) = /* пусто */;
+    (asm s.ANY e.ANYs) = /* пусто */;
     (t.Expr "=" t.Expr) = /* пусто */;
 }
