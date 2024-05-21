@@ -1,0 +1,2 @@
+(const int = 1)
+(const ptr = 1)

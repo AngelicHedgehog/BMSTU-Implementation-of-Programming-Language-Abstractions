@@ -1,3 +1,3 @@
 rlmake.bat main.ref -o a.exe
-./a.exe example.txt
+./a.exe source.txt dest.txt
 rm a.exe

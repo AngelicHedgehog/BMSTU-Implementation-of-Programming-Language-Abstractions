@@ -1,11 +1,12 @@
-$EXTERN Statement
+*$FROM src/Statement.ref
+$EXTERN Statement;
 
 /**
   <Code t.Statement*> == s.AsmCodeCmd*
 */
 $ENTRY Code {
-    t.Statement e.Statements
-        =   <Statement t.Statement>
-            <Code e.Statements>
-    /* пусто */ = /* пусто */;
+  t.Statement e.Statements
+    = <Statement t.Statement>
+      <Code e.Statements>;
+  /* пусто */ = /* пусто */;
 }

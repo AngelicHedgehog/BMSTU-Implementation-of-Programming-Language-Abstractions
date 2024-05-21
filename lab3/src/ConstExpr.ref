@@ -1,16 +1,30 @@
-$EXTERN Name, ConstExprm, BinOp;
+*$FROM src/Name.ref
+*$FROM src/ConstExpr.ref
+$EXTERN Name, ConstExpr;
 
 /**
   <ConstExpr
+    t.Names
       s.Name
     | s.NUMBER
-    | ("-" t.ConstExpr)
+    | ('-' t.ConstExpr)
     | (t.ConstExpr s.BinOp t.ConstExpr)
-  > == s.AsmCodeCmd*
+  > == s.ConstVal
 */
-$ENTRY {
-    s.Name = /* пусто */;
-    s.NUMBER = /* пусто */;
-    ("-" t.ConstExpr) = /* пусто */;
-    (t.ConstExpr s.BinOp t.ConstExpr) = /* пусто */;
+$ENTRY ConstExpr {
+  t.Names s.Name
+    , <Name t.Names s.Name> : SUCC s.Val
+    = s.Val;
+  t.Names s.NUMBER = s.NUMBER;
+  t.Names ('-' t.ConstExpr) = <Sub 0 <ConstExpr t.Names t.ConstExpr>>;
+  t.Names (t.ConstExprL s.BinOp t.ConstExprR)
+    , <ConstExpr t.Names t.ConstExprL> : s.LeftVal
+    , <ConstExpr t.Names t.ConstExprR> : s.RightVal
+    , s.BinOp : {
+      '+' = <Add s.LeftVal s.RightVal>;
+      '-' = <Sub s.LeftVal s.RightVal>;
+      '*' = <Mul s.LeftVal s.RightVal>;
+      '/' = <Div s.LeftVal s.RightVal>;
+      '%' = <Mod s.LeftVal s.RightVal>;
+    };
 }

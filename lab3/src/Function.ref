@@ -1,11 +1,14 @@
+*$FROM src/Name.ref
+*$FROM src/LocalVars.ref
+*$FROM src/Code.ref
 $EXTERN Name, LocalVars, Code;
 
 /**
   <Function (function s.Name (s.Name*) t.LocalVars? e.Code)> == s.AsmCodeCmd*
 */
 $ENTRY Function {
-    (function s.Name e.s_Name_star (var e.LocalVars) e.Code)
-        = /* пусто */;
-    (function s.Name e.s_Name_star e.Code)
-        = (function s.Name e.s_Name_star (var) e.Code);
+  (function s.Name e.s_Name_star (var e.LocalVars) e.Code)
+    = /* пусто */;
+  (function s.Name e.s_Name_star e.Code)
+    = (function s.Name e.s_Name_star (var) e.Code);
 }

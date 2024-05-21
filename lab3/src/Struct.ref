@@ -1,8 +1,17 @@
+*$FROM src/Name.ref
+*$FROM src/ConstExpr.ref
 $EXTERN Name, ConstExpr;
 
 /**
-  <Struct (struct s.Name (s.Name t.ConstExpr)*)> == s.AsmCodeCmd*
+  <Struct (struct s.Name (s.Name t.ConstExpr)*)> == e.Names
 */
 $ENTRY Struct {
-    (struct s.Name e.NamesConstExprs) = /* пусто */;
+  (struct s.Name e.Fields) = <_Struct 0 s.Name e.Fields>;
+}
+
+_Struct {
+  (s.Size s.Name) = (s.Name s.Size);
+  (s.Size s.Name (s.FieldName t.ConstExpr) e.Fields)
+    , <ConstExpr t.ConstExpr> : s.ConstVal
+    = (s.FieldName s.ConstVal) <_Struct 0 s.Name e.Fields>;
 }

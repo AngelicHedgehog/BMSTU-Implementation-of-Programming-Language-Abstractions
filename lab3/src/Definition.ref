@@ -1,11 +1,19 @@
-$EXTERN Struct, Const, GlobalVal, Function
+*$FROM src/Struct.ref
+*$FROM src/Const.ref
+*$FROM src/GlobalVar.ref
+*$FROM src/Function.ref
+$EXTERN Struct, Const, GlobalVar, Function;
 
 /**
-  <Definition t.Struct | t.Const | t.GlobalVar | t.Function> == s.AsmCodeCmd*
+  <Definition t.Names
+      t.Struct
+    | t.Const
+    | t.GlobalVar
+    | t.Function> == t.Names s.AsmCodeCmd*
 */
 $ENTRY Definition {
-    (struct e.Struct) = <Struct (struct e.Struct)>
-    (const e.Const) = <Const (const e.Const)>
-    (var e.GlobalVal) = <GlobalVal (var e.GlobalVal)>
-    (function e.Function) = <Function (function e.Function)>
+  t.Names (struct e.Struct) = <Struct t.Names (struct e.Struct)>;
+  t.Names (const e.Const) = <Const t.Names (const e.Const)>;
+  t.Names (var e.GlobalVar) = <GlobalVar t.Names (var e.GlobalVar)>;
+  t.Names (function e.Function) = <Function t.Names (function e.Function)>;
 }

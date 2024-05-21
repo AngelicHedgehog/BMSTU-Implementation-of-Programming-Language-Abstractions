@@ -1,0 +1,40 @@
+(const int = 1)
+(const ptr = 1)
+
+(struct Point
+    (Point_x int)
+    (Point_y int)
+)
+
+(struct Line
+    (Line_start Point)
+    (Line_end Point)
+)
+
+(struct ListNode
+    (ListNode_value int)
+    (ListNode_next ptr)
+)
+
+(var Counter 1)
+(var Items 5 "=" 1 2 3 4 5)
+
+(var rising Line "=" 0 0 10 10)
+(var result_array 4)
+(var count int)
+(var list_head ptr)
+
+(function gcd (x y)
+	(var (rem 1))
+	(while ((L y) "<>" 0)
+		(rem "=" ((L x) "%" (L y)))
+		(x "=" (L y))
+		(y "=" (L rem))
+	)
+	(return (L y))
+)
+
+(function main ()
+	(call gcd 2 2)
+	(return 0)
+)

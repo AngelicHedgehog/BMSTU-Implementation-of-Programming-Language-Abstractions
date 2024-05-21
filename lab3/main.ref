@@ -1,6 +1,7 @@
 *$FROM LibraryEx
-$EXTERN LoadExpr;
+*$FROM src/Program.ref
+$EXTERN LoadExpr, Program;
 
 $ENTRY Go {
-     /* пусто */ = <Prout <LoadExpr <Arg 1>>>;
+  /* пусто */ = <Prout <Program <LoadExpr <Arg 1>>>>;
 }

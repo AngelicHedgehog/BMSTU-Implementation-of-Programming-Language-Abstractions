@@ -1,8 +1,11 @@
+*$FROM src/Expr.ref
+*$FROM src/BoolExpr.ref
+*$FROM src/Code.ref
 $EXTERN Expr, BoolExpr, Code;
 
 /**
   <Statement
-      (t.Expr "=" t.Expr)
+      (t.Expr '=' t.Expr)
     | (call t.Expr t.Expr*)
     | (return t.Expr)
     | (if t.BoolExpr e.Code)
@@ -12,13 +15,13 @@ $EXTERN Expr, BoolExpr, Code;
   > == s.AsmCodeCmd*
 */
 $ENTRY Statement {
-    (call t.Expr) = /* пусто */;
-    (call t.Expr e.Exprs) = /* пусто */;
-    (return t.Expr) = /* пусто */;
-    (if t.BoolExpr e.Code else e.Code) = /* пусто */;
-    (if t.BoolExpr e.Code) = /* пусто */;
-    (whie t.BoolExpr e.Code) = /* пусто */;
-    (asm s.ANY) = /* пусто */;
-    (asm s.ANY e.ANYs) = /* пусто */;
-    (t.Expr "=" t.Expr) = /* пусто */;
+  (call t.Expr) = /* пусто */;
+  (call t.Expr e.Exprs) = /* пусто */;
+  (return t.Expr) = /* пусто */;
+  (if t.BoolExpr e.Code else e.Code) = /* пусто */;
+  (if t.BoolExpr e.Code) = /* пусто */;
+  (whie t.BoolExpr e.Code) = /* пусто */;
+  (asm s.ANY) = /* пусто */;
+  (asm s.ANY e.ANYs) = /* пусто */;
+  (t.Expr '=' t.Expr) = /* пусто */;
 }

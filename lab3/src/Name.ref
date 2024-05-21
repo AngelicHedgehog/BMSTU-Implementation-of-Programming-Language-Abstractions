@@ -1,6 +1,7 @@
 /**
-  <Name s.WORD> == s.WORD
+  <Name t.Names s.WORD> == s.VAL
 */
 $ENTRY Name {
-    s.WORD = s.WORD;
+  (e._ (s.WORD s.VAL) e._) s.WORD = SUCC s.VAL;
+  e._ = ERR;
 }

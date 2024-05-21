@@ -1,11 +1,19 @@
-$EXTERN Definition
+*$FROM src/Definition.ref
+$EXTERN Definition;
 
 /**
   <Program t.Definition*> == s.AsmCodeCmd*
 */
 $ENTRY Program {
-    t.Definition e.Definitions
-        =   <Definition t.Definition>
-            <Program e.Definitions>
-    /* пусто */ = /* пусто */;
+  e.Definitions = <_Program () e.Definitions>;
+}
+
+/**
+  <_Program t.Names t.Definition*> == s.AsmCodeCmd*
+*/
+_Program {
+  t.Names = t.Names /* пусто */;
+  t.Names t.Definition e.Definitions
+    , <Definition t.Names t.Definition> : t.DefNames e.Code
+    = e.Code <_Program t.DefNames e.Definitions>;
 }

@@ -1,8 +1,11 @@
-$EXTERN Name, ConstExpr;
+*$FROM src/ConstExpr.ref
+$EXTERN ConstExpr;
 
 /**
-  <Const (const s.Name "=" t.ConstExpr)> == s.AsmCodeCmd*
+  <Const t.Names (const s.Name '=' t.ConstExpr)> == t.Names
 */
 $ENTRY Const {
-    (const s.Name "=" t.ConstExpr) = /* пусто */;
+  (e.Names) (const s.Name '=' t.ConstExpr)
+    , <ConstExpr (e.Names) t.ConstExpr> : s.ConstVal
+    = (e.Names (s.Name s.ConstVal));
 }
