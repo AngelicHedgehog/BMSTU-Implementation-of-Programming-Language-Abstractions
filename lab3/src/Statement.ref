@@ -20,8 +20,7 @@ $ENTRY Statement {
   (return t.Expr) = /* пусто */;
   (if t.BoolExpr e.Code else e.Code) = /* пусто */;
   (if t.BoolExpr e.Code) = /* пусто */;
-  (whie t.BoolExpr e.Code) = /* пусто */;
-  (asm s.ANY) = /* пусто */;
-  (asm s.ANY e.ANYs) = /* пусто */;
+  (while t.BoolExpr e.Code) = /* пусто */;
+  (asm e.ANYS) = '\n' e.ANYS '\n';
   (t.Expr "=" t.Expr) = /* пусто */;
 }

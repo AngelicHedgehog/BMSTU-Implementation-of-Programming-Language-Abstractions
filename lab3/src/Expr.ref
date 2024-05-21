@@ -21,6 +21,5 @@ $ENTRY Expr {
   (t.Expr s.BinOp t.Expr) = /* пусто */;
   (call t.Expr) = /* пусто */;
   (call t.Expr e.Exprs) = /* пусто */;
-  (asm s.ANY) = /* пусто */;
-  (asm s.ANY e.ANYS) = /* пусто */;
+  (asm e.Code) = '\n' e.Code '\n';
 }

@@ -1,12 +1,13 @@
-*$FROM src/Name.ref
 *$FROM src/ConstExpr.ref
 *$FROM src/Init.ref
-$EXTERN Name, ConstExpr, Init;
+$EXTERN ConstExpr, Init;
 
 /**
-  <GlobalVar (var s.Name t.ConstExpr e.Init?)> == s.AsmCodeCmd*
+  <GlobalVar t.Names (var s.Name t.ConstExpr e.Init?)> == s.AsmCodeCmd*
 */
 $ENTRY GlobalVar {
-  (var s.Name t.ConstExpr) = /* пусто */;
-  (var s.Name t.ConstExpr e.Init) = /* пусто */;
+  t.Names (var s.Name t.ConstExpr) = <GlobalVar t.Names (var s.Name t.ConstExpr "=")>;
+  t.Names (var s.Name t.ConstExpr e.Init)
+    , <ConstExpr t.Names t.ConstExpr> : s.Size
+    = t.Names ':_' s.Name '\n' <Init t.Names s.Size e.Init> '\n';
 }
