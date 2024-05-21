@@ -4,7 +4,7 @@ $EXTERN Name, ConstExpr;
 
 /**
   <ConstExpr
-    t.Names
+    t.Consts
       s.Name
     | s.NUMBER
     | ("-" t.ConstExpr)
@@ -12,14 +12,14 @@ $EXTERN Name, ConstExpr;
   > == s.ConstVal
 */
 $ENTRY ConstExpr {
-  t.Names s.Name
-    , <Name t.Names s.Name> : SUCC s.Val
+  t.Consts s.Name
+    , <Name t.Consts s.Name> : SUCC s.Val
     = s.Val;
-  t.Names s.NUMBER = s.NUMBER;
-  t.Names ("-" t.ConstExpr) = <Sub 0 <ConstExpr t.Names t.ConstExpr>>;
-  t.Names (t.ConstExprL s.BinOp t.ConstExprR)
-    , <ConstExpr t.Names t.ConstExprL> : s.LeftVal
-    , <ConstExpr t.Names t.ConstExprR> : s.RightVal
+  t.Consts s.NUMBER = s.NUMBER;
+  t.Consts ("-" t.ConstExpr) = <Sub 0 <ConstExpr t.Consts t.ConstExpr>>;
+  t.Consts (t.ConstExprL s.BinOp t.ConstExprR)
+    , <ConstExpr t.Consts t.ConstExprL> : s.LeftVal
+    , <ConstExpr t.Consts t.ConstExprR> : s.RightVal
     , s.BinOp : {
       "+" = <Add s.LeftVal s.RightVal>;
       "-" = <Sub s.LeftVal s.RightVal>;
