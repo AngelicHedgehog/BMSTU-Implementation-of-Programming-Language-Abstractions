@@ -7,7 +7,7 @@ $EXTERN Name, BinOp;
       s.Name
     | s.NUMBER
     | (L t.Expr)
-    | ('-' t.Expr)
+    | ("-" t.Expr)
     | (t.Expr s.BinOp t.Expr)
     | (call t.Expr t.Expr*)
     | (asm s.ANY+)
@@ -17,7 +17,7 @@ $ENTRY Expr {
   s.Name = /* пусто */;
   s.NUMBER = /* пусто */;
   (L t.Expr) = /* пусто */;
-  ('-' t.Expr) = /* пусто */;
+  ("-" t.Expr) = /* пусто */;
   (t.Expr s.BinOp t.Expr) = /* пусто */;
   (call t.Expr) = /* пусто */;
   (call t.Expr e.Exprs) = /* пусто */;

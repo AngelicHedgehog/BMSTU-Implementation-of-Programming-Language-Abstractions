@@ -1,2 +1,22 @@
-(const int = 1)
-(const ptr = 1)
+(const int "=" 1)
+(const ptr "=" 1)
+
+(struct Point
+    (Point_x int)
+    (Point_y int)
+)
+
+(struct Line
+    (Line_start Point)
+    (Line_end Point)
+)
+
+(struct ListNode
+    (ListNode_value int)
+    (ListNode_next ptr)
+)
+
+(struct ColorPoint
+    ("-" Point)
+    (ColorPoint_color int)
+)

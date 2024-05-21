@@ -3,15 +3,19 @@
 $EXTERN Name, ConstExpr;
 
 /**
-  <Struct (struct s.Name (s.Name t.ConstExpr)*)> == e.Names
+  <Struct t.Names (struct s.Name (s.Name t.ConstExpr)*)> == t.Names
 */
 $ENTRY Struct {
-  (struct s.Name e.Fields) = <_Struct 0 s.Name e.Fields>;
+  (e.Names) (struct s.Name e.Fields) = (e.Names <_Struct (e.Names) 0 s.Name e.Fields>);
 }
 
 _Struct {
-  (s.Size s.Name) = (s.Name s.Size);
-  (s.Size s.Name (s.FieldName t.ConstExpr) e.Fields)
-    , <ConstExpr t.ConstExpr> : s.ConstVal
-    = (s.FieldName s.ConstVal) <_Struct 0 s.Name e.Fields>;
+  t.Names s.Size s.Name = (s.Name s.Size);
+  t.Names s.Size s.Name ("-" t.ConstExpr) e.Fields
+    , <ConstExpr t.Names t.ConstExpr> : s.FieldSize
+    = <_Struct t.Names <Add s.Size s.FieldSize> s.Name e.Fields>;
+  t.Names s.Size s.Name (s.FieldName t.ConstExpr) e.Fields
+    , <ConstExpr t.Names t.ConstExpr> : s.FieldSize
+    = (s.FieldName s.Size)
+      <_Struct t.Names <Add s.Size s.FieldSize> s.Name e.Fields>;
 }

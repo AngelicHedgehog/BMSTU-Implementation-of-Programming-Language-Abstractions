@@ -7,7 +7,7 @@ $EXTERN Name, ConstExpr;
     t.Names
       s.Name
     | s.NUMBER
-    | ('-' t.ConstExpr)
+    | ("-" t.ConstExpr)
     | (t.ConstExpr s.BinOp t.ConstExpr)
   > == s.ConstVal
 */
@@ -16,15 +16,15 @@ $ENTRY ConstExpr {
     , <Name t.Names s.Name> : SUCC s.Val
     = s.Val;
   t.Names s.NUMBER = s.NUMBER;
-  t.Names ('-' t.ConstExpr) = <Sub 0 <ConstExpr t.Names t.ConstExpr>>;
+  t.Names ("-" t.ConstExpr) = <Sub 0 <ConstExpr t.Names t.ConstExpr>>;
   t.Names (t.ConstExprL s.BinOp t.ConstExprR)
     , <ConstExpr t.Names t.ConstExprL> : s.LeftVal
     , <ConstExpr t.Names t.ConstExprR> : s.RightVal
     , s.BinOp : {
-      '+' = <Add s.LeftVal s.RightVal>;
-      '-' = <Sub s.LeftVal s.RightVal>;
-      '*' = <Mul s.LeftVal s.RightVal>;
-      '/' = <Div s.LeftVal s.RightVal>;
-      '%' = <Mod s.LeftVal s.RightVal>;
+      "+" = <Add s.LeftVal s.RightVal>;
+      "-" = <Sub s.LeftVal s.RightVal>;
+      "*" = <Mul s.LeftVal s.RightVal>;
+      "/" = <Div s.LeftVal s.RightVal>;
+      "%" = <Mod s.LeftVal s.RightVal>;
     };
 }

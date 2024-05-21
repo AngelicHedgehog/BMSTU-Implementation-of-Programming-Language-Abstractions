@@ -5,7 +5,7 @@ $EXTERN Expr, BoolExpr, Code;
 
 /**
   <Statement
-      (t.Expr '=' t.Expr)
+      (t.Expr "=" t.Expr)
     | (call t.Expr t.Expr*)
     | (return t.Expr)
     | (if t.BoolExpr e.Code)
@@ -23,5 +23,5 @@ $ENTRY Statement {
   (whie t.BoolExpr e.Code) = /* пусто */;
   (asm s.ANY) = /* пусто */;
   (asm s.ANY e.ANYs) = /* пусто */;
-  (t.Expr '=' t.Expr) = /* пусто */;
+  (t.Expr "=" t.Expr) = /* пусто */;
 }

@@ -2,8 +2,8 @@
 $EXTERN ConstExpr;
 
 /**
-  <Init '=' t.ConstExpr*> == s.AsmCodeCmd*
+  <Init "=" t.ConstExpr*> == s.AsmCodeCmd*
 */
 $ENTRY Init {
-  '=' e.ConstExprs = /* пусто */;
+  "=" e.ConstExprs = /* пусто */;
 }
