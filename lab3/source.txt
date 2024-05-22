@@ -28,3 +28,18 @@
 (var result_array 4)
 (var count int)
 (var list_head ptr)
+
+(function gcd (x y)
+	(var (rem 1) (A 4) (BbBB 9))
+	(while ((L y) "<>" 0)
+		(rem "=" ((L x) "%" (L y)))
+		(x "=" (L y))
+		(y "=" (L rem))
+	)
+	(return (L y))
+)
+
+(function main ()
+	(call gcd 2 2)
+	(return 0)
+)

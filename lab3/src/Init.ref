@@ -2,12 +2,12 @@
 $EXTERN ConstExpr;
 
 /**
-  <Init t.Names s.Size "=" t.ConstExpr*> == s.AsmCodeCmd*
+  <Init t.Globals s.Size "=" t.ConstExpr*> == s.AsmCodeCmd*
 */
 $ENTRY Init {
-  t.Names 0 "=" = /* пусто */;
-  t.Names s.Size "=" = 0 <Init t.Names <Sub s.Size 1> "=">;
-  t.Names s.Size "=" t.ConstExpr e.ConstExprs
-    , <ConstExpr t.Names t.ConstExpr> : s.ConstVal
-    = s.ConstVal <Init t.Names <Sub s.Size 1> "=" e.ConstExprs>;
+  t.Globals 0 "=" = /* пусто */;
+  t.Globals s.Size "=" = 0 <Init t.Globals <Sub s.Size 1> "=">;
+  t.Globals s.Size "=" t.ConstExpr e.ConstExprs
+    , <ConstExpr t.Globals t.ConstExpr> : s.ConstVal
+    = s.ConstVal <Init t.Globals <Sub s.Size 1> "=" e.ConstExprs>;
 }

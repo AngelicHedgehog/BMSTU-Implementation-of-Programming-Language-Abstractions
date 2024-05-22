@@ -24,7 +24,8 @@ $ENTRY Expr {
     = s.Val;
   t.Consts t.Locals s.Name
     , <Name t.Locals s.Name> : SUCC s.Val
-    = GETFP s.Val SUB;
+    = GETFP s.Val ADD;
+  t.Consts t.Locals s.Name = '_' s.Name;
   t.Consts t.Locals (L t.Expr) = <Expr t.Consts t.Locals t.Expr> LOAD;
   t.Consts t.Locals ("-" t.Expr) = <Expr t.Consts t.Locals t.Expr> NEG;
   t.Consts t.Locals (call t.Expr e.Exprs)

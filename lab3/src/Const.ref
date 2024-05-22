@@ -2,10 +2,10 @@
 $EXTERN ConstExpr;
 
 /**
-  <Const t.Names (const s.Name "=" t.ConstExpr)> == t.Names
+  <Const t.Globals (const s.Name "=" t.ConstExpr)> == t.Globals
 */
 $ENTRY Const {
-  (e.Names) (const s.Name "=" t.ConstExpr)
-    , <ConstExpr (e.Names) t.ConstExpr> : s.ConstVal
-    = (e.Names (s.Name s.ConstVal));
+  (e.Globals) (const s.Name "=" t.ConstExpr)
+    , <ConstExpr (e.Globals) t.ConstExpr> : s.ConstVal
+    = (e.Globals (s.Name s.ConstVal));
 }

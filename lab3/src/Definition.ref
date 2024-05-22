@@ -5,15 +5,15 @@
 $EXTERN Struct, Const, GlobalVar, Function;
 
 /**
-  <Definition t.Names
+  <Definition t.Globals
       t.Struct
     | t.Const
     | t.GlobalVar
-    | t.Function> == t.Names s.AsmCodeCmd*
+    | t.Function> == t.Globals s.AsmCodeCmd*
 */
 $ENTRY Definition {
-  t.Names (struct e.Struct) = <Struct t.Names (struct e.Struct)>;
-  t.Names (const e.Const) = <Const t.Names (const e.Const)>;
-  t.Names (var e.GlobalVar) = <GlobalVar t.Names (var e.GlobalVar)>;
-  t.Names (function e.Function) = <Function t.Names (function e.Function)>;
+  t.Globals (struct e.Struct) = <Struct t.Globals (struct e.Struct)>;
+  t.Globals (const e.Const) = <Const t.Globals (const e.Const)>;
+  t.Globals (var e.GlobalVar) = <GlobalVar t.Globals (var e.GlobalVar)>;
+  t.Globals (function e.Function) = <Function t.Globals (function e.Function)>;
 }

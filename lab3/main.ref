@@ -3,5 +3,6 @@
 $EXTERN LoadExpr, Program;
 
 $ENTRY Go {
+*  = <Prout <Sub 0 1>>;
   /* пусто */ = <Prout <Program <LoadExpr <Arg 1>>>>;
 }

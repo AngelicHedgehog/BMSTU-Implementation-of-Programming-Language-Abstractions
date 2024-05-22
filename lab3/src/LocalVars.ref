@@ -3,8 +3,17 @@
 $EXTERN Name, ConstExpr;
 
 /**
-  <LocalVars (var (s.Name t.ConstExpr)*)> == s.AsmCodeCmd*
+  <LocalVars (var (s.Name t.ConstExpr)*)> == t.Locals e.AllocateCode
 */
 $ENTRY LocalVars {
-  (var e.NamesConstExprs) = /* пусто */;
+  /* пусто */ = '|';
+  e.LocalVars = <_LocalVars 0 e.LocalVars> PUSHN '\n';
+}
+
+_LocalVars {
+  s.MemShift = '|' s.MemShift;
+  s.MemShift (s.VarName s.VarSize) e.LocalVars
+    , <Add s.MemShift s.VarSize> : s.VarShift
+    = (s.VarName <Sub 0 s.VarShift>)
+      <_LocalVars s.VarShift e.LocalVars>;
 }

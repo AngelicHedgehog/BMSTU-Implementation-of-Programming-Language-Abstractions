@@ -1,14 +1,38 @@
-*$FROM src/Name.ref
 *$FROM src/LocalVars.ref
 *$FROM src/Code.ref
-$EXTERN Name, LocalVars, Code;
+$EXTERN LocalVars, Code;
 
 /**
   <Function (function s.Name (s.Name*) t.LocalVars? e.Code)> == s.AsmCodeCmd*
 */
 $ENTRY Function {
-  (function s.Name e.s_Name_star (var e.LocalVars) e.Code)
-    = /* пусто */;
-  (function s.Name e.s_Name_star e.Code)
-    = (function s.Name e.s_Name_star (var) e.Code);
+  t.Globals (function s.Name (e.Params) (var e.LocalVars) e.Code)
+    , <CompileParams 2 0 e.Params> : e.LocalParams s.ParamCount
+    , <Compare s.ParamCount 0> : {
+      '+' = s.ParamCount RETN;
+      e._ = JMP;
+    } : e.EpilogCode
+    , <LocalVars e.LocalVars> : e.Locals '|' e.AllocateCode
+    , e.LocalParams e.Locals ("_epilog" ('__' s.Name)) : e.AllLocals
+    = t.Globals
+      ':_' s.Name '\n'
+      GETFP GETSP SETFP '\n'
+      e.AllocateCode
+      AHAHAHAH_CODE (e.AllLocals) '\n'
+      ':__' s.Name '\n'
+      GETFP SETSP SETFP '\n'
+      e.EpilogCode '\n'
+      '\n';
+  t.Globals (function s.Name t.Params e.Code)
+    = <Function t.Globals (function s.Name t.Params (var) e.Code)>;
+}
+
+CompileParams {
+  s.MemShift s.ParamCount = s.ParamCount;
+  s.MemShift s.ParamCount s.ParamName e.Params
+    = (s.ParamName s.MemShift)
+      <CompileParams
+        <Add s.MemShift 1>
+        <Add s.ParamCount 1>
+        e.Params>;
 }

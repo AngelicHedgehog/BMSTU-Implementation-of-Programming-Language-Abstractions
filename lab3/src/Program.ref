@@ -9,11 +9,11 @@ $ENTRY Program {
 }
 
 /**
-  <_Program t.Names t.Definition*> == s.AsmCodeCmd*
+  <_Program t.Globals t.Definition*> == s.AsmCodeCmd*
 */
 _Program {
-  t.Names = t.Names /* пусто */;
-  t.Names t.Definition e.Definitions
-    , <Definition t.Names t.Definition> : t.DefNames e.Code
-    = e.Code <_Program t.DefNames e.Definitions>;
+  t.Globals = t.Globals /* пусто */;
+  t.Globals t.Definition e.Definitions
+    , <Definition t.Globals t.Definition> : t.DefGlobals e.Code
+    = e.Code <_Program t.DefGlobals e.Definitions>;
 }
