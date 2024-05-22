@@ -1,6 +1,9 @@
 *$FROM src/Name.ref
 *$FROM src/BinOp.ref
-$EXTERN Name, BinOp;
+*$FROM src/LocalVars.ref
+*$FROM src/Code.ref
+*$FROM LibraryEx
+$EXTERN Name, BinOp, LocalVars, Code, Map;
 
 /**
   <Expr
@@ -14,6 +17,7 @@ $EXTERN Name, BinOp;
     | (call t.Expr t.Expr*)
     | (asm s.ANY+)
     | (t.Expr "=" t.Expr)
+    | (let t.LocalVars e.Code t.Expr)
   > == t.Locals s.AsmCodeCmd*
 */
 $ENTRY Expr {
@@ -22,6 +26,30 @@ $ENTRY Expr {
     , <Expr t.Globals t.Locals1 t.ExprR> : t.Locals2 e.R
     = t.Locals2
       e.L e.R SAVE e.R;
+  
+  t.Globals (e.Locals) (let (e.LocalVars) e.Code t.Expr)
+    , <LocalVars e.LocalVars> : {
+      e.LocalVars1_ '|' s.AllocateSize_ PUSHN '\n' = e.LocalVars1_ s.AllocateSize_;
+      '|' = 0;
+    } : e.LocalVars1 s.AllocateSize
+    , <Map {
+      (s.Name e.Val (e.FPWay)) = (s.Name e.Val (e.FPWay LOAD));
+      e.Other = e.Other;
+    } e.Locals> e.LocalVars1 : e.Locals1
+    , <Code t.Globals (e.Locals1) e.Code> : (e.Locals2) e.AsmCode
+    , <Expr t.Globals (e.Locals2) t.Expr> : (e.Locals3) e.ExprCode
+    , <Map {
+      (s.Name e.Val (e.FPWay LOAD)) = (s.Name e.Val (e.FPWay));
+      e.Other = e.Other;
+    } e.Locals3> : e.Locals4
+    = (e.Locals4)
+      GETFP GETSP SETFP '\n'
+      s.AllocateSize PUSHN '\n'
+      e.AsmCode
+      e.ExprCode
+      SETRV
+      GETFP SETSP SETFP '\n'
+      GETRV;
 
   t.Globals t.Locals s.Number
     , <Type s.Number> : 'N' e._
@@ -53,7 +81,7 @@ $ENTRY Expr {
       e.Args e.Func
       CALL GETRV;
 
-  t.Globals t.Locals (asm e.Code) = t.Locals e.Code '\n';
+  t.Globals t.Locals (asm e.Code) = t.Locals e.Code;
 
   t.Globals t.Locals (t.ExprL s.BinOp t.ExprR)
     , <Expr t.Globals t.Locals t.ExprL> : t.Locals1 e.L

@@ -6,8 +6,7 @@ GETRV HALT
 
 :_in 
 GETFP GETSP SETFP 
-IN 
-SETRV __in JMP 
+IN SETRV __in JMP 
 :__in 
 GETFP SETSP SETFP 
 JMP 
@@ -21,8 +20,7 @@ GETFP SETSP SETFP
 
 :_getFP 
 GETFP GETSP SETFP 
-GETFP 
-SETRV __getFP JMP 
+GETFP SETRV __getFP JMP 
 :__getFP 
 GETFP SETSP SETFP 
 JMP 
@@ -99,7 +97,39 @@ GETFP GETSP SETFP
 _newLine CALL GETRV DROP 
 4 _nearSquare CALL GETRV _printInt CALL GETRV DROP 
 _newLine CALL GETRV DROP 
-6 4 _gcd CALL GETRV _printInt CALL GETRV DROP 
+GETFP GETSP SETFP 
+2 PUSHN 
+GETFP 1 SUB 1 SAVE 
+GETFP 2 SUB GETFP GETSP SETFP 
+2 PUSHN 
+GETFP 1 SUB 49 SAVE 
+GETFP 2 SUB 0 SAVE 
+:_loop_while_0_main 
+GETFP 1 SUB LOAD 
+GETFP 2 SUB LOAD _nearSquare CALL GETRV 
+CMP _true_while_0_main JGT 
+_exit_while_0_main JMP 
+:_true_while_0_main 
+GETFP 2 SUB GETFP 2 SUB LOAD GETFP LOAD 1 SUB LOAD ADD SAVE 
+_loop_while_0_main JMP 
+:_exit_while_0_main 
+GETFP 2 SUB LOAD _printInt CALL GETRV DROP 
+_newLine CALL GETRV DROP 
+GETFP 2 SUB LOAD SETRV GETFP SETSP SETFP 
+GETRV SAVE 
+:_loop_while_1_main 
+GETFP 1 SUB LOAD 
+GETFP 2 SUB LOAD 
+CMP _true_while_1_main JLT 
+_exit_while_1_main JMP 
+:_true_while_1_main 
+GETFP 1 SUB GETFP 1 SUB LOAD 1 ADD SAVE 
+_loop_while_1_main JMP 
+:_exit_while_1_main 
+GETFP 1 SUB LOAD _printInt CALL GETRV DROP 
+_newLine CALL GETRV DROP 
+GETFP 1 SUB LOAD SETRV GETFP SETSP SETFP 
+GETRV 4 _gcd CALL GETRV _printInt CALL GETRV DROP 
 _newLine CALL GETRV DROP 
 0 SETRV __main JMP 
 :__main 
