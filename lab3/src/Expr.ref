@@ -17,6 +17,12 @@ $EXTERN Name, BinOp;
   > == t.Locals s.AsmCodeCmd*
 */
 $ENTRY Expr {
+  t.Globals t.Locals (t.ExprL "=" t.ExprR)
+    , <Expr t.Globals t.Locals t.ExprL> : t.Locals1 e.L
+    , <Expr t.Globals t.Locals1 t.ExprR> : t.Locals2 e.R
+    = t.Locals2
+      e.L e.R SAVE e.R;
+
   t.Globals t.Locals s.Number
     , <Type s.Number> : 'N' e._
     = t.Locals s.Number;
@@ -26,11 +32,15 @@ $ENTRY Expr {
     = t.Locals e.Val;
 
   t.Globals t.Locals s.Name
+    , <Name t.Locals s.Name> : ERR
+    = t.Locals '_' s.Name;
+
+  t.Globals t.Locals s.Name
     , <Name t.Locals s.Name> : {
-      SUCC '-' s.Val = t.Locals GETFP s.Val SUB;
-      SUCC s.Val = t.Locals GETFP s.Val ADD;
-      ERR = t.Locals '_' s.Name;
-    };
+      SUCC '-' s.Val (e.FPWay) = s.Val e.FPWay SUB;
+      SUCC s.Val (e.FPWay) = s.Val e.FPWay ADD;
+    } : s.Val e.FPWay s.Op
+    = t.Locals e.FPWay s.Val s.Op;
 
   t.Globals t.Locals (L t.Expr) = <Expr t.Globals t.Locals t.Expr> LOAD;
 
@@ -44,12 +54,6 @@ $ENTRY Expr {
       CALL GETRV;
 
   t.Globals t.Locals (asm e.Code) = t.Locals e.Code '\n';
-  
-  t.Globals t.Locals (t.ExprL "=" t.ExprR)
-    , <Expr t.Globals t.Locals t.ExprL> : t.Locals1 e.L
-    , <Expr t.Globals t.Locals1 t.ExprR> : t.Locals2 e.R
-    = t.Locals2
-      e.L e.R SAVE e.R;
 
   t.Globals t.Locals (t.ExprL s.BinOp t.ExprR)
     , <Expr t.Globals t.Locals t.ExprL> : t.Locals1 e.L

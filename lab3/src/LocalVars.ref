@@ -14,6 +14,6 @@ _LocalVars {
   s.MemShift = '|' s.MemShift;
   s.MemShift (s.VarName s.VarSize) e.LocalVars
     , <Add s.MemShift s.VarSize> : s.VarShift
-    = (s.VarName <Sub 0 s.VarShift>)
+    = (s.VarName <Sub 0 s.VarShift> (GETFP))
       <_LocalVars s.VarShift e.LocalVars>;
 }

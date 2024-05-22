@@ -18,12 +18,12 @@ $ENTRY Function {
       (_if_count 0)
       (_while_count 0)
       (_bool_count 0) : e.Locals2
-    , <Code t.Globals (e.Locals2) e.Code> : t.Locals3 e.C
+    , <Code t.Globals (e.Locals2) e.Code> : t.Locals3 e.AsmCode
     = t.Globals
       ':_' s.Name '\n'
       GETFP GETSP SETFP '\n'
       e.AllocateCode
-      e.C
+      e.AsmCode
       ':__' s.Name '\n'
       GETFP SETSP SETFP '\n'
       e.EpilogCode '\n'
@@ -36,7 +36,7 @@ $ENTRY Function {
 CompileParams {
   s.MemShift s.ParamCount = s.ParamCount;
   s.MemShift s.ParamCount s.ParamName e.Params
-    = (s.ParamName s.MemShift)
+    = (s.ParamName s.MemShift (GETFP))
       <CompileParams
         <Add s.MemShift 1>
         <Add s.ParamCount 1>

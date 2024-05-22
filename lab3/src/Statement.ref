@@ -2,7 +2,9 @@
 *$FROM src/BoolExpr.ref
 *$FROM src/Code.ref
 *$FROM src/Name.ref
-$EXTERN Expr, BoolExpr, Code, Name;
+*$FROM src/LocalVars.ref
+*$FROM LibraryEx
+$EXTERN Expr, BoolExpr, Code, Name, LocalVars, Map;
 
 /**
   <Statement
@@ -14,9 +16,30 @@ $EXTERN Expr, BoolExpr, Code, Name;
     | (if t.BoolExpr e.Code else e.Code)
     | (while t.BoolExpr e.Code)
     | (asm s.ANY+)
+    | (block t.LocalVars e.Code)
   > == t.Locals s.AsmCodeCmd*
 */
 $ENTRY Statement {
+  t.Globals (e.Locals) (block (e.LocalVars) e.Code)
+    , <LocalVars e.LocalVars> : {
+      e.LocalVars1_ '|' s.AllocateSize_ PUSHN '\n' = e.LocalVars1_ s.AllocateSize_;
+      '|' = 0;
+    } : e.LocalVars1 s.AllocateSize
+    , <Map {
+      (s.Name e.Val (e.FPWay)) = (s.Name e.Val (e.FPWay LOAD));
+      e.Other = e.Other;
+    } e.Locals> e.LocalVars1 : e.Locals1
+    , <Code t.Globals (e.Locals1) e.Code> : (e.Locals2) e.AsmCode
+    , <Map {
+      (s.Name e.Val (e.FPWay LOAD)) = (s.Name e.Val (e.FPWay));
+      e.Other = e.Other;
+    } e.Locals2> : e.Locals3
+    = (e.Locals3)
+      GETFP GETSP SETFP '\n'
+      s.AllocateSize PUSHN '\n'
+      e.AsmCode
+      GETFP SETSP SETFP '\n';
+
   t.Globals t.Locals (t.ExprL "=" t.ExprR)
     , <Expr t.Globals t.Locals t.ExprL> : t.Locals1 e.ExprL
     , <Expr t.Globals t.Locals1 t.ExprR> : t.Locals2 e.ExprR
