@@ -3,7 +3,7 @@
 $EXTERN ConstExpr, Init;
 
 /**
-  <GlobalVar t.Globals (var s.Name t.ConstExpr e.Init?)> == s.AsmCodeCmd*
+  <GlobalVar t.Globals (var s.Name t.ConstExpr e.Init?)> == t.Globals s.AsmCodeCmd*
 */
 $ENTRY GlobalVar {
   t.Globals (var s.Name t.ConstExpr) = <GlobalVar t.Globals (var s.Name t.ConstExpr "=")>;

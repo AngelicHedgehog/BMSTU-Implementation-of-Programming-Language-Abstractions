@@ -3,7 +3,7 @@
 $EXTERN LocalVars, Code;
 
 /**
-  <Function (function s.Name (s.Name*) t.LocalVars? e.Code)> == s.AsmCodeCmd*
+  <Function (function s.Name (s.Name*) t.LocalVars? e.Code)> == t.Globals s.AsmCodeCmd*
 */
 $ENTRY Function {
   t.Globals (function s.Name (e.Params) (var e.LocalVars) e.Code)
@@ -12,17 +12,23 @@ $ENTRY Function {
       '+' = s.ParamCount RETN;
       e._ = JMP;
     } : e.EpilogCode
-    , <LocalVars e.LocalVars> : e.Locals '|' e.AllocateCode
-    , e.LocalParams e.Locals (_func_name s.Name) (_if_count 0) (_while_count 0) : e.AllLocals
+    , <LocalVars e.LocalVars> : e.Locals1 '|' e.AllocateCode
+    , e.LocalParams e.Locals1
+      (_func_name s.Name)
+      (_if_count 0)
+      (_while_count 0)
+      (_bool_count 0) : e.Locals2
+    , <Code t.Globals (e.Locals2) e.Code> : t.Locals3 e.C
     = t.Globals
       ':_' s.Name '\n'
       GETFP GETSP SETFP '\n'
       e.AllocateCode
-      <Code t.Globals (e.AllLocals) e.Code>
+      e.C
       ':__' s.Name '\n'
       GETFP SETSP SETFP '\n'
       e.EpilogCode '\n'
       '\n';
+
   t.Globals (function s.Name t.Params e.Code)
     = <Function t.Globals (function s.Name t.Params (var) e.Code)>;
 }

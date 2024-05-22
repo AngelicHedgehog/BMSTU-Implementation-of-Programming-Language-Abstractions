@@ -18,52 +18,57 @@ $EXTERN Expr, BoolExpr, Code, Name;
 */
 $ENTRY Statement {
   t.Globals t.Locals (t.ExprL "=" t.ExprR)
-    = t.Locals
-      <Expr t.Globals t.Locals t.ExprL>
-      <Expr t.Globals t.Locals t.ExprR>
-      SAVE '\n';
+    , <Expr t.Globals t.Locals t.ExprL> : t.Locals1 e.ExprL
+    , <Expr t.Globals t.Locals1 t.ExprR> : t.Locals2 e.ExprR
+    = t.Locals2
+      e.ExprL e.ExprR SAVE '\n';
 
   t.Globals t.Locals (call t.Expr e.Exprs)
-    = t.Locals
-      <Expr t.Globals t.Locals (call t.Expr e.Exprs)> DROP '\n';
+    = <Expr t.Globals t.Locals (call t.Expr e.Exprs)> DROP '\n';
 
   t.Globals t.Locals (return t.Expr)
     , <Name t.Locals _func_name> : SUCC s.FuncName
-    = t.Locals
-      <Expr t.Globals t.Locals t.Expr>
+    = <Expr t.Globals t.Locals t.Expr>
       SETRV
       '__' s.FuncName JMP '\n';
 
   t.Globals (e.LocalsL (_if_count s.IfNum) e.LocalsR) (if t.BoolExpr e.CodeT else e.CodeF)
-    , (e.LocalsL (_if_count <Add s.IfNum 1>) e.LocalsR) : t.Locals
-    , <Name t.Locals _func_name> : SUCC s.FuncName
+    , (e.LocalsL (_if_count <Add s.IfNum 1>) e.LocalsR) : t.Locals1
+    , <Name t.Locals1 _func_name> : SUCC s.FuncName
     , '_if_' <itoa s.IfNum> '_' s.FuncName : e.IfName
     , e.CodeF : {
-      /* пусто */ = /* пусто */;
-      e._ = '_exit' e.IfName JMP '\n'
-            ':_false' e.IfName '\n'
-            <Code t.Globals t.Locals e.CodeF>;
-    } : e.ElseCode
-    = t.Locals
-      CONDITION '\n'
+      /* пусто */ = t.Locals1 ('_exit');
+      e._
+        , <Code t.Globals t.Locals1 e.CodeF> : t.Locals2 e.FCode
+        = t.Locals2
+          '_exit' e.IfName JMP '\n'
+          ':_false' e.IfName '\n'
+          e.FCode
+          ('_false');
+    } : t.Locals3 e.ElseCode (e.FalseAlt)
+    , <BoolExpr t.Globals t.Locals3 ('_true' e.IfName) (e.FalseAlt e.IfName) t.BoolExpr> : t.Locals4 e.BoolCode
+    , <Code t.Globals t.Locals4 e.CodeT> : t.Locals5 e.TrueCode
+    = t.Locals5
+      e.BoolCode '\n'
       ':_true' e.IfName '\n'
-      <Code t.Globals t.Locals e.CodeT>
+      e.TrueCode
       e.ElseCode
       ':_exit' e.IfName '\n';
 
   t.Globals t.Locals (if t.BoolExpr e.Code)
-    = t.Locals
-      <Statement t.Globals t.Locals (if t.BoolExpr e.Code else)>;
+    = <Statement t.Globals t.Locals (if t.BoolExpr e.Code else)>;
 
-  t.Globals (e.LocalsL (_while_count s.WhileNum) e.LocalsR) (while t.BoolExpr e.Code)
-    , (e.LocalsL (_while_count <Add s.WhileNum 1>) e.LocalsR) : t.Locals
-    , <Name t.Locals _func_name> : SUCC s.FuncName
+  t.Globals (e.LocalsL (_while_count s.WhileNum) e.LocalsR) (while t.BoolExpr e.InnerCode)
+    , (e.LocalsL (_while_count <Add s.WhileNum 1>) e.LocalsR) : t.Locals1
+    , <Name t.Locals1 _func_name> : SUCC s.FuncName
     , '_while_' <itoa s.WhileNum> '_' s.FuncName : e.WhileName
-    = t.Locals
+    , <BoolExpr t.Globals t.Locals1 ('_true' e.WhileName) ('_exit' e.WhileName) t.BoolExpr> : t.Locals2 e.BoolCode
+    , <Code t.Globals t.Locals2 e.InnerCode> : t.Locals3 e.Code
+    = t.Locals3
       ':_loop' e.WhileName '\n'
-      CONDITION '\n'
-      '_true' e.WhileName '\n'
-      <Code t.Globals t.Locals e.Code>
+      e.BoolCode '\n'
+      ':_true' e.WhileName '\n'
+      e.Code
       '_loop' e.WhileName JMP '\n'
       ':_exit' e.WhileName '\n';
 
@@ -73,9 +78,7 @@ $ENTRY Statement {
 }
 
 itoa {
-  '-' s.Int = '-' <itoa s.Int>;
-  s.Int
-    , <Compare s.Int 9> : {
+  s.Int, <Compare s.Int 9> : {
       '+' = <itoa <Div s.Int 10>> <itoa <Mod s.Int 10>>;
       e._ = <Chr <Add 48 s.Int>>
     };

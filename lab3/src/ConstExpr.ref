@@ -13,8 +13,8 @@ $EXTERN Name, ConstExpr;
 */
 $ENTRY ConstExpr {
   t.Globals s.Name
-    , <Name t.Globals s.Name> : SUCC s.Val
-    = s.Val;
+    , <Name t.Globals s.Name> : SUCC e.Val
+    = e.Val;
 
   t.Globals s.NUMBER = s.NUMBER;
 

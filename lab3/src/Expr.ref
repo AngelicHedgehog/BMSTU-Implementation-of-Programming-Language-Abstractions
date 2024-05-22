@@ -13,42 +13,57 @@ $EXTERN Name, BinOp;
     | (t.Expr s.BinOp t.Expr)
     | (call t.Expr t.Expr*)
     | (asm s.ANY+)
-  > == s.AsmCodeCmd*
+    | (t.Expr "=" t.Expr)
+  > == t.Locals s.AsmCodeCmd*
 */
 $ENTRY Expr {
   t.Globals t.Locals s.Number
     , <Type s.Number> : 'N' e._
-    = s.Number;
+    = t.Locals s.Number;
 
   t.Globals t.Locals s.Name
-    , <Name t.Globals s.Name> : SUCC s.Val
-    = s.Val;
+    , <Name t.Globals s.Name> : SUCC e.Val
+    = t.Locals e.Val;
 
   t.Globals t.Locals s.Name
-    , <Name t.Locals s.Name> : SUCC s.Val
-    = GETFP s.Val ADD;
-
-  t.Globals t.Locals s.Name = '_' s.Name;
+    , <Name t.Locals s.Name> : {
+      SUCC '-' s.Val = t.Locals GETFP s.Val SUB;
+      SUCC s.Val = t.Locals GETFP s.Val ADD;
+      ERR = t.Locals '_' s.Name;
+    };
 
   t.Globals t.Locals (L t.Expr) = <Expr t.Globals t.Locals t.Expr> LOAD;
 
   t.Globals t.Locals ("-" t.Expr) = <Expr t.Globals t.Locals t.Expr> NEG;
 
   t.Globals t.Locals (call t.Expr e.Exprs)
-    = <CompileArgs t.Globals t.Locals e.Exprs>
-      <Expr t.Globals t.Locals t.Expr> CALL GETRV;
+    , <CompileArgs t.Globals t.Locals e.Exprs> : t.Locals1 e.Args
+    , <Expr t.Globals t.Locals1 t.Expr> : t.Locals2 e.Func
+    = t.Locals2
+      e.Args e.Func
+      CALL GETRV;
 
-  t.Globals t.Locals (asm e.Code) = e.Code '\n';
+  t.Globals t.Locals (asm e.Code) = t.Locals e.Code '\n';
   
+  t.Globals t.Locals (t.ExprL "=" t.ExprR)
+    , <Expr t.Globals t.Locals t.ExprL> : t.Locals1 e.L
+    , <Expr t.Globals t.Locals1 t.ExprR> : t.Locals2 e.R
+    = t.Locals2
+      e.L e.R SAVE e.R;
+
   t.Globals t.Locals (t.ExprL s.BinOp t.ExprR)
-    = <Expr t.Globals t.Locals t.ExprL>
-      <Expr t.Globals t.Locals t.ExprR>
+    , <Expr t.Globals t.Locals t.ExprL> : t.Locals1 e.L
+    , <Expr t.Globals t.Locals1 t.ExprR> : t.Locals2 e.R
+    = t.Locals2
+      e.L e.R
       <BinOp s.BinOp>;
 }
 
 CompileArgs {
   t.Globals t.Locals e.Args t.Arg
-    = <Expr t.Globals t.Locals t.Arg>
-      <CompileArgs t.Globals t.Locals e.Args>;
-  t.Globals t.Locals = /* пусто */;
+    , <Expr t.Globals t.Locals t.Arg> : t.Locals1 e.CmpArg
+    , <CompileArgs t.Globals t.Locals1 e.Args> : t.Locals2 e.CmpArgs
+    = t.Locals2
+      e.CmpArg e.CmpArgs;
+  t.Globals t.Locals = t.Locals;
 }

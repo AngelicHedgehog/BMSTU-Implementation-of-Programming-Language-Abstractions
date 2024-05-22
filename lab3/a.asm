@@ -34,33 +34,33 @@ GETFP 2 ADD LOAD HALT
 GETFP SETSP SETFP 
 1 RETN 
 
-:_gcd 
+:_printInt 
 GETFP GETSP SETFP 
-1 PUSHN 
-:_loop_while_0_gcd 
-CONDITION 
-_true_while_0_gcd 
-_rem GETFP 2 ADD LOAD GETFP 3 ADD LOAD MOD SAVE 
-GETFP 2 ADD GETFP 3 ADD LOAD SAVE 
-GETFP 3 ADD _rem LOAD SAVE 
-_loop_while_0_gcd JMP 
-:_exit_while_0_gcd 
-:_loop_while_1_gcd 
-CONDITION 
-_true_while_1_gcd 
-_rem GETFP 2 ADD LOAD GETFP 3 ADD LOAD MOD SAVE 
-GETFP 2 ADD GETFP 3 ADD LOAD SAVE 
-GETFP 3 ADD _rem LOAD SAVE 
-_loop_while_1_gcd JMP 
-:_exit_while_1_gcd 
-GETFP 3 ADD LOAD SETRV __gcd JMP 
-:__gcd 
+GETFP 2 ADD LOAD 
+10 
+CMP _true_if_0_printInt JGE 
+_exit_if_0_printInt JMP 
+:_true_if_0_printInt 
+GETFP 2 ADD LOAD 10 DIV _printInt CALL GETRV DROP 
+:_exit_if_0_printInt 
+GETFP 2 ADD LOAD 10 MOD 48 ADD _out CALL GETRV DROP 
+:__printInt 
 GETFP SETSP SETFP 
-2 RETN 
+1 RETN 
+
+:_newLine 
+GETFP GETSP SETFP 
+10 _out CALL GETRV DROP 
+:__newLine 
+GETFP SETSP SETFP 
+JMP 
 
 :_nearSquare 
 GETFP GETSP SETFP 
-CONDITION 
+GETFP 2 ADD LOAD 
+3 
+CMP _true_if_0_nearSquare JLE 
+_false_if_0_nearSquare JMP 
 :_true_if_0_nearSquare 
 GETFP 2 ADD 0 SAVE 
 _exit_if_0_nearSquare JMP 
@@ -72,10 +72,33 @@ GETFP 2 ADD LOAD GETFP 2 ADD LOAD MUL SETRV __nearSquare JMP
 GETFP SETSP SETFP 
 1 RETN 
 
+:_gcd 
+GETFP GETSP SETFP 
+1 PUSHN 
+:_loop_while_0_gcd 
+GETFP 3 ADD LOAD 
+0 
+CMP _true_while_0_gcd JNE 
+_exit_while_0_gcd JMP 
+:_true_while_0_gcd 
+GETFP 1 SUB GETFP 2 ADD LOAD GETFP 3 ADD LOAD MOD SAVE 
+GETFP 2 ADD GETFP 3 ADD LOAD SAVE 
+GETFP 3 ADD GETFP 1 SUB LOAD SAVE 
+_loop_while_0_gcd JMP 
+:_exit_while_0_gcd 
+GETFP 2 ADD LOAD SETRV __gcd JMP 
+:__gcd 
+GETFP SETSP SETFP 
+2 RETN 
+
 :_main 
 GETFP GETSP SETFP 
-97 3 _nextSquare CALL GETRV ADD _out CALL GETRV DROP 
-97 4 _nextSquare CALL GETRV ADD _out CALL GETRV DROP 
+3 _nearSquare CALL GETRV _printInt CALL GETRV DROP 
+_newLine CALL GETRV DROP 
+4 _nearSquare CALL GETRV _printInt CALL GETRV DROP 
+_newLine CALL GETRV DROP 
+6 4 _gcd CALL GETRV _printInt CALL GETRV DROP 
+_newLine CALL GETRV DROP 
 0 SETRV __main JMP 
 :__main 
 GETFP SETSP SETFP 
