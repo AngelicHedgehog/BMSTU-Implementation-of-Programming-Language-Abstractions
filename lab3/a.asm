@@ -4,6 +4,14 @@ GETRV HALT
 :_MEMORY_SIZE 0 
 :_PROGRAM_SIZE PROGRAM_SIZE 
 
+:_in 
+GETFP GETSP SETFP 
+IN 
+SETRV __in JMP 
+:__in 
+GETFP SETSP SETFP 
+JMP 
+
 :_out 
 GETFP GETSP SETFP 
 GETFP 2 ADD LOAD OUT 
@@ -11,16 +19,63 @@ GETFP 2 ADD LOAD OUT
 GETFP SETSP SETFP 
 1 RETN 
 
-:_square 
+:_getFP 
 GETFP GETSP SETFP 
-GETFP 2 ADD LOAD GETFP 2 ADD LOAD MUL SETRV __square JMP 
-:__square 
+GETFP 
+SETRV __getFP JMP 
+:__getFP 
+GETFP SETSP SETFP 
+JMP 
+
+:_halt 
+GETFP GETSP SETFP 
+GETFP 2 ADD LOAD HALT 
+:__halt 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_gcd 
+GETFP GETSP SETFP 
+1 PUSHN 
+:_loop_while_0_gcd 
+CONDITION 
+_true_while_0_gcd 
+_rem GETFP 2 ADD LOAD GETFP 3 ADD LOAD MOD SAVE 
+GETFP 2 ADD GETFP 3 ADD LOAD SAVE 
+GETFP 3 ADD _rem LOAD SAVE 
+_loop_while_0_gcd JMP 
+:_exit_while_0_gcd 
+:_loop_while_1_gcd 
+CONDITION 
+_true_while_1_gcd 
+_rem GETFP 2 ADD LOAD GETFP 3 ADD LOAD MOD SAVE 
+GETFP 2 ADD GETFP 3 ADD LOAD SAVE 
+GETFP 3 ADD _rem LOAD SAVE 
+_loop_while_1_gcd JMP 
+:_exit_while_1_gcd 
+GETFP 3 ADD LOAD SETRV __gcd JMP 
+:__gcd 
+GETFP SETSP SETFP 
+2 RETN 
+
+:_nearSquare 
+GETFP GETSP SETFP 
+CONDITION 
+:_true_if_0_nearSquare 
+GETFP 2 ADD 0 SAVE 
+_exit_if_0_nearSquare JMP 
+:_false_if_0_nearSquare 
+GETFP 2 ADD GETFP 2 ADD LOAD 1 ADD SAVE 
+:_exit_if_0_nearSquare 
+GETFP 2 ADD LOAD GETFP 2 ADD LOAD MUL SETRV __nearSquare JMP 
+:__nearSquare 
 GETFP SETSP SETFP 
 1 RETN 
 
 :_main 
 GETFP GETSP SETFP 
-97 5 _square CALL GETRV ADD _out CALL GETRV DROP 
+97 3 _nextSquare CALL GETRV ADD _out CALL GETRV DROP 
+97 4 _nextSquare CALL GETRV ADD _out CALL GETRV DROP 
 0 SETRV __main JMP 
 :__main 
 GETFP SETSP SETFP 

@@ -14,22 +14,69 @@ $EXTERN Expr, BoolExpr, Code, Name;
     | (if t.BoolExpr e.Code else e.Code)
     | (while t.BoolExpr e.Code)
     | (asm s.ANY+)
-  > == s.AsmCodeCmd*
+  > == t.Locals s.AsmCodeCmd*
 */
 $ENTRY Statement {
   t.Globals t.Locals (t.ExprL "=" t.ExprR)
-    = <Expr t.Globals t.Locals t.ExprL>
+    = t.Locals
+      <Expr t.Globals t.Locals t.ExprL>
       <Expr t.Globals t.Locals t.ExprR>
       SAVE '\n';
+
   t.Globals t.Locals (call t.Expr e.Exprs)
-    = <Expr t.Globals t.Locals (call t.Expr e.Exprs)> DROP '\n';
+    = t.Locals
+      <Expr t.Globals t.Locals (call t.Expr e.Exprs)> DROP '\n';
+
   t.Globals t.Locals (return t.Expr)
     , <Name t.Locals _func_name> : SUCC s.FuncName
-    = <Expr t.Globals t.Locals t.Expr>
+    = t.Locals
+      <Expr t.Globals t.Locals t.Expr>
       SETRV
       '__' s.FuncName JMP '\n';
-  t.Globals t.Locals (if t.BoolExpr e.Code else e.Code) = /* пусто */;
-  t.Globals t.Locals (if t.BoolExpr e.Code) = /* пусто */;
-  t.Globals t.Locals (while t.BoolExpr e.Code) = /* пусто */;
-  t.Globals t.Locals (asm e.ANYS) = e.ANYS '\n';
+
+  t.Globals (e.LocalsL (_if_count s.IfNum) e.LocalsR) (if t.BoolExpr e.CodeT else e.CodeF)
+    , (e.LocalsL (_if_count <Add s.IfNum 1>) e.LocalsR) : t.Locals
+    , <Name t.Locals _func_name> : SUCC s.FuncName
+    , '_if_' <itoa s.IfNum> '_' s.FuncName : e.IfName
+    , e.CodeF : {
+      /* пусто */ = /* пусто */;
+      e._ = '_exit' e.IfName JMP '\n'
+            ':_false' e.IfName '\n'
+            <Code t.Globals t.Locals e.CodeF>;
+    } : e.ElseCode
+    = t.Locals
+      CONDITION '\n'
+      ':_true' e.IfName '\n'
+      <Code t.Globals t.Locals e.CodeT>
+      e.ElseCode
+      ':_exit' e.IfName '\n';
+
+  t.Globals t.Locals (if t.BoolExpr e.Code)
+    = t.Locals
+      <Statement t.Globals t.Locals (if t.BoolExpr e.Code else)>;
+
+  t.Globals (e.LocalsL (_while_count s.WhileNum) e.LocalsR) (while t.BoolExpr e.Code)
+    , (e.LocalsL (_while_count <Add s.WhileNum 1>) e.LocalsR) : t.Locals
+    , <Name t.Locals _func_name> : SUCC s.FuncName
+    , '_while_' <itoa s.WhileNum> '_' s.FuncName : e.WhileName
+    = t.Locals
+      ':_loop' e.WhileName '\n'
+      CONDITION '\n'
+      '_true' e.WhileName '\n'
+      <Code t.Globals t.Locals e.Code>
+      '_loop' e.WhileName JMP '\n'
+      ':_exit' e.WhileName '\n';
+
+  t.Globals t.Locals (asm e.ANYS)
+    = t.Locals
+      e.ANYS '\n';
+}
+
+itoa {
+  '-' s.Int = '-' <itoa s.Int>;
+  s.Int
+    , <Compare s.Int 9> : {
+      '+' = <itoa <Div s.Int 10>> <itoa <Mod s.Int 10>>;
+      e._ = <Chr <Add 48 s.Int>>
+    };
 }

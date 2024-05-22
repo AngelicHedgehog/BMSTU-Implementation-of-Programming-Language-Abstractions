@@ -19,19 +19,27 @@ $ENTRY Expr {
   t.Globals t.Locals s.Number
     , <Type s.Number> : 'N' e._
     = s.Number;
+
   t.Globals t.Locals s.Name
     , <Name t.Globals s.Name> : SUCC s.Val
     = s.Val;
+
   t.Globals t.Locals s.Name
     , <Name t.Locals s.Name> : SUCC s.Val
     = GETFP s.Val ADD;
+
   t.Globals t.Locals s.Name = '_' s.Name;
+
   t.Globals t.Locals (L t.Expr) = <Expr t.Globals t.Locals t.Expr> LOAD;
+
   t.Globals t.Locals ("-" t.Expr) = <Expr t.Globals t.Locals t.Expr> NEG;
+
   t.Globals t.Locals (call t.Expr e.Exprs)
     = <CompileArgs t.Globals t.Locals e.Exprs>
       <Expr t.Globals t.Locals t.Expr> CALL GETRV;
+
   t.Globals t.Locals (asm e.Code) = e.Code '\n';
+  
   t.Globals t.Locals (t.ExprL s.BinOp t.ExprR)
     = <Expr t.Globals t.Locals t.ExprL>
       <Expr t.Globals t.Locals t.ExprR>

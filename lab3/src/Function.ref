@@ -13,7 +13,7 @@ $ENTRY Function {
       e._ = JMP;
     } : e.EpilogCode
     , <LocalVars e.LocalVars> : e.Locals '|' e.AllocateCode
-    , e.LocalParams e.Locals (_func_name s.Name) : e.AllLocals
+    , e.LocalParams e.Locals (_func_name s.Name) (_if_count 0) (_while_count 0) : e.AllLocals
     = t.Globals
       ':_' s.Name '\n'
       GETFP GETSP SETFP '\n'

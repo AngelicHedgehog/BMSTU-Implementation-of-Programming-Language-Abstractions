@@ -1,12 +1,41 @@
+(function in ()
+    (return (asm IN))
+)
+
 (function out (char)
     (asm GETFP 2 ADD LOAD OUT)
 )
 
-(function square (x)
+(function getFP ()
+    (return (asm GETFP))
+)
+
+(function halt (code)
+    (asm GETFP 2 ADD LOAD HALT)
+)
+
+(function gcd (x y)
+	(var (rem 1))
+	(while ((L y) "<>" 0)
+		(rem "=" ((L x) "%" (L y)))
+		(x "=" (L y))
+		(y "=" (L rem))
+	)
+	(return (L y))
+)
+
+(function nearSquare (x)
+    (if ((L x) ">" 3)
+        (x "=" 0)
+    else
+        (x "=" ((L x) "+" 1))
+    )
+    
     (return ((L x) "*" (L x)))
 )
 
 (function main ()
-    (call out (97 "+" (call square 5)))
+    (call out (97 "+" (call nextSquare 3)))
+    (call out (97 "+" (call nextSquare 4)))
     (return 0)
 )

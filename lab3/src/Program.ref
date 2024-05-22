@@ -6,8 +6,7 @@ $EXTERN Definition;
 */
 $ENTRY Program {
   e.Definitions
-    = 
-      GETSP _MEMORY_SIZE SWAP SAVE '\n'
+    = GETSP _MEMORY_SIZE SWAP SAVE '\n'
       _main CALL '\n'
       GETRV HALT '\n'
       ':'_MEMORY_SIZE 0 '\n'

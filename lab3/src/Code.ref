@@ -6,7 +6,8 @@ $EXTERN Statement;
 */
 $ENTRY Code {
   t.Globals t.Locals t.Statement e.Statements
-    = <Statement t.Globals t.Locals t.Statement>
-      <Code t.Globals t.Locals e.Statements>;
+    , <Statement t.Globals t.Locals t.Statement> : t.NewLocals e.Code
+    = e.Code
+      <Code t.Globals t.NewLocals e.Statements>;
   t.Globals t.Locals = /* пусто */;
 }
