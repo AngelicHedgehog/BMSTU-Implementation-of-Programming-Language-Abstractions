@@ -5,14 +5,20 @@ $EXTERN Definition;
   <Program t.Definition*> == s.AsmCodeCmd*
 */
 $ENTRY Program {
-  e.Definitions = <_Program () e.Definitions>;
+  e.Definitions
+    = GETSP _MEMORY_SIZE SWAP SAVE '\n'
+      _main CALL '\n'
+      GETRV HALT '\n'
+      ':'_MEMORY_SIZE 0 '\n'
+      ':'_PROGRAM_SIZE PROGRAM_SIZE '\n\n'
+      <_Program () e.Definitions>;
 }
 
 /**
   <_Program t.Globals t.Definition*> == s.AsmCodeCmd*
 */
 _Program {
-  t.Globals = t.Globals /* пусто */;
+  t.Globals = /* пусто */;
   t.Globals t.Definition e.Definitions
     , <Definition t.Globals t.Definition> : t.DefGlobals e.Code
     = e.Code <_Program t.DefGlobals e.Definitions>;
