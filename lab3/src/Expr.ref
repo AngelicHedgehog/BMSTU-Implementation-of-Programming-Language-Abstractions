@@ -4,7 +4,7 @@ $EXTERN Name, BinOp;
 
 /**
   <Expr
-    t.Consts
+    t.Globals
     t.Locals
       s.Name
     | s.NUMBER
@@ -16,30 +16,31 @@ $EXTERN Name, BinOp;
   > == s.AsmCodeCmd*
 */
 $ENTRY Expr {
-  t.Consts t.Locals s.Number
+  t.Globals t.Locals s.Number
     , <Type s.Number> : 'N' e._
     = s.Number;
-  t.Consts t.Locals s.Name
-    , <Name t.Consts s.Name> : SUCC s.Val
+  t.Globals t.Locals s.Name
+    , <Name t.Globals s.Name> : SUCC s.Val
     = s.Val;
-  t.Consts t.Locals s.Name
+  t.Globals t.Locals s.Name
     , <Name t.Locals s.Name> : SUCC s.Val
     = GETFP s.Val ADD;
-  t.Consts t.Locals s.Name = '_' s.Name;
-  t.Consts t.Locals (L t.Expr) = <Expr t.Consts t.Locals t.Expr> LOAD;
-  t.Consts t.Locals ("-" t.Expr) = <Expr t.Consts t.Locals t.Expr> NEG;
-  t.Consts t.Locals (call t.Expr e.Exprs)
-    = <CompileArgs t.Consts t.Locals e.Exprs> <Expr t.Expr> CALL GETRV;
-  t.Consts t.Locals (asm e.Code) = '\n' e.Code '\n';
-  t.Consts t.Locals (t.ExprL s.BinOp t.ExprR)
-    = <Expr t.Consts t.Locals t.ExprL>
-      <Expr t.Consts t.Locals t.ExprR>
+  t.Globals t.Locals s.Name = '_' s.Name;
+  t.Globals t.Locals (L t.Expr) = <Expr t.Globals t.Locals t.Expr> LOAD;
+  t.Globals t.Locals ("-" t.Expr) = <Expr t.Globals t.Locals t.Expr> NEG;
+  t.Globals t.Locals (call t.Expr e.Exprs)
+    = <CompileArgs t.Globals t.Locals e.Exprs>
+      <Expr t.Globals t.Locals t.Expr> CALL GETRV;
+  t.Globals t.Locals (asm e.Code) = e.Code '\n';
+  t.Globals t.Locals (t.ExprL s.BinOp t.ExprR)
+    = <Expr t.Globals t.Locals t.ExprL>
+      <Expr t.Globals t.Locals t.ExprR>
       <BinOp s.BinOp>;
 }
 
 CompileArgs {
-  t.Consts t.Locals e.Args t.Arg
-    = <Expr t.Consts t.Locals t.Arg>
-      <CompileArgs t.Consts t.Locals e.Args>;
-  t.Consts t.Locals = /* пусто */;
+  t.Globals t.Locals e.Args t.Arg
+    = <Expr t.Globals t.Locals t.Arg>
+      <CompileArgs t.Globals t.Locals e.Args>;
+  t.Globals t.Locals = /* пусто */;
 }

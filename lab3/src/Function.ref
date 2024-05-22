@@ -18,7 +18,7 @@ $ENTRY Function {
       ':_' s.Name '\n'
       GETFP GETSP SETFP '\n'
       e.AllocateCode
-      AHAHAHAH_CODE (e.AllLocals) '\n'
+      <Code t.Globals (e.AllLocals) e.Code>
       ':__' s.Name '\n'
       GETFP SETSP SETFP '\n'
       e.EpilogCode '\n'

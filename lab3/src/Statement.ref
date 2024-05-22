@@ -1,10 +1,12 @@
 *$FROM src/Expr.ref
 *$FROM src/BoolExpr.ref
 *$FROM src/Code.ref
-$EXTERN Expr, BoolExpr, Code;
+*$FROM src/Name.ref
+$EXTERN Expr, BoolExpr, Code, Name;
 
 /**
   <Statement
+    t.Globals t.Locals
       (t.Expr "=" t.Expr)
     | (call t.Expr t.Expr*)
     | (return t.Expr)
@@ -15,12 +17,19 @@ $EXTERN Expr, BoolExpr, Code;
   > == s.AsmCodeCmd*
 */
 $ENTRY Statement {
-  (call t.Expr) = /* пусто */;
-  (call t.Expr e.Exprs) = /* пусто */;
-  (return t.Expr) = /* пусто */;
-  (if t.BoolExpr e.Code else e.Code) = /* пусто */;
-  (if t.BoolExpr e.Code) = /* пусто */;
-  (while t.BoolExpr e.Code) = /* пусто */;
-  (asm e.ANYS) = '\n' e.ANYS '\n';
-  (t.Expr "=" t.Expr) = /* пусто */;
+  t.Globals t.Locals (t.ExprL "=" t.ExprR)
+    = <Expr t.Globals t.Locals t.ExprL>
+      <Expr t.Globals t.Locals t.ExprR>
+      SAVE '\n';
+  t.Globals t.Locals (call t.Expr e.Exprs)
+    = <Expr t.Globals t.Locals (call t.Expr e.Exprs)> DROP '\n';
+  t.Globals t.Locals (return t.Expr)
+    , <Name t.Locals _func_name> : SUCC s.FuncName
+    = <Expr t.Globals t.Locals t.Expr>
+      SETRV
+      '__' s.FuncName JMP '\n';
+  t.Globals t.Locals (if t.BoolExpr e.Code else e.Code) = /* пусто */;
+  t.Globals t.Locals (if t.BoolExpr e.Code) = /* пусто */;
+  t.Globals t.Locals (while t.BoolExpr e.Code) = /* пусто */;
+  t.Globals t.Locals (asm e.ANYS) = e.ANYS '\n';
 }

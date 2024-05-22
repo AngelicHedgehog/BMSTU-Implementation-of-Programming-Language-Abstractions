@@ -2,11 +2,11 @@
 $EXTERN Statement;
 
 /**
-  <Code t.Statement*> == s.AsmCodeCmd*
+  <Code t.Globals t.Locals t.Statement*> == s.AsmCodeCmd*
 */
 $ENTRY Code {
-  t.Statement e.Statements
-    = <Statement t.Statement>
-      <Code e.Statements>;
-  /* пусто */ = /* пусто */;
+  t.Globals t.Locals t.Statement e.Statements
+    = <Statement t.Globals t.Locals t.Statement>
+      <Code t.Globals t.Locals e.Statements>;
+  t.Globals t.Locals = /* пусто */;
 }
