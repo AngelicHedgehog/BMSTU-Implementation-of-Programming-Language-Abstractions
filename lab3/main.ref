@@ -3,6 +3,5 @@
 $EXTERN LoadExpr, SaveFile, Program;
 
 $ENTRY Go {
-*  = <Prout <Sub 0 1>>;
   /* пусто */ = <SaveFile (<Arg 2>) (<Program <LoadExpr <Arg 1>>>)>;
 }
