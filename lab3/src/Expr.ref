@@ -25,7 +25,7 @@ $ENTRY Expr {
     , <Expr t.Globals t.Locals t.ExprL> : t.Locals1 e.L
     , <Expr t.Globals t.Locals1 t.ExprR> : t.Locals2 e.R
     = t.Locals2
-      e.L e.R SAVE e.R;
+      e.L e.R SWAP OVER SAVE;
   
   t.Globals (e.Locals) (let (e.LocalVars) e.Code t.Expr)
     , <LocalVars e.LocalVars> : {

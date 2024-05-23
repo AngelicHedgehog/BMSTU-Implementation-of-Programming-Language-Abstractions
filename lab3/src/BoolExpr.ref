@@ -57,6 +57,7 @@ $ENTRY BoolExpr {
       e.FLabel JMP;
 }
 
+* Symb
 itoa {
   s.Int, <Compare s.Int 9> : {
       '+' = <itoa <Div s.Int 10>> <itoa <Mod s.Int 10>>;
