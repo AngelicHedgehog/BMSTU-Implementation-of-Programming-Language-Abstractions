@@ -40,6 +40,7 @@ $ENTRY Expr {
     , <Expr t.Globals (e.Locals2) t.Expr> : (e.Locals3) e.ExprCode
     , <Map {
       (s.Name e.Val (e.FPWay LOAD)) = (s.Name e.Val (e.FPWay));
+      (s.Name e.Val (GETFP)) = /* пусто */;
       e.Other = e.Other;
     } e.Locals3> : e.Locals4
     = (e.Locals4)

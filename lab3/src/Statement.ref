@@ -32,6 +32,7 @@ $ENTRY Statement {
     , <Code t.Globals (e.Locals1) e.Code> : (e.Locals2) e.AsmCode
     , <Map {
       (s.Name e.Val (e.FPWay LOAD)) = (s.Name e.Val (e.FPWay));
+      (s.Name e.Val (GETFP)) = /* пусто */;
       e.Other = e.Other;
     } e.Locals2> : e.Locals3
     = (e.Locals3)

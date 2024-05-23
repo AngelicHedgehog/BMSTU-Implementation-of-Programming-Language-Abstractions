@@ -36,14 +36,17 @@
 )
 
 (function gcd (x y)
-    (var (ha 3))
+    (var (res 1))
+    
 	(block ((ram 4) (rem 1))
         (while ((L y) "<>" 0)
             (rem "=" ((L x) "%" (x "=" (L y))))
             (y "=" (L rem))
 	    )
     )
-	(return (L x))
+    (res "=" (L x))
+
+	(return (L res))
 )
 
 (function main ()
