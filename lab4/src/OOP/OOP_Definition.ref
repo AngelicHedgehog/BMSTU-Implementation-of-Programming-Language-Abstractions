@@ -4,14 +4,15 @@ $EXTERN OOP_Function, OOP_Class;
 
 /**
   <OOP_Definition
+    t.Classes
       t.Struct
     | t.Const
     | t.GlobalVar
     | t.Function
-    | t.Class> == t.Definition
+    | t.Class> == t.Classes t.Definition
 */
 $ENTRY OOP_Definition {
-  (function e.Function) = <OOP_Function (function e.Function)>;
-  (class e.Class) = <OOP_Class (class e.Class)>;
-  e.Other = e.Other;
+  t.Classes (function e.Function) = t.Classes <OOP_Function (function e.Function)>;
+  t.Classes (class e.Class) = <OOP_Class t.Classes (class e.Class)>;
+  t.Classes e.Other = t.Classes e.Other;
 }

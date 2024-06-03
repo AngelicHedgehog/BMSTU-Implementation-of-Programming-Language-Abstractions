@@ -5,7 +5,12 @@ $EXTERN OOP_Definition;
   <OOP_Program t.Definition*> == e.Program
 */
 $ENTRY OOP_Program {
-  t.Definition e.Definitions
-    = <OOP_Definition t.Definition> <OOP_Program e.Definitions>;
-  /* пусто */ = /* пусто */;
+    e.Definitions = <_OOP_Program () e.Definitions>;
+}
+
+$ENTRY _OOP_Program {
+  t.Classes t.Definition e.Definitions
+    , <OOP_Definition t.Classes t.Definition> : t.Classes1 e.Definition1
+    = e.Definition1 <_OOP_Program t.Classes1 e.Definitions>;
+  t.Classes = /* пусто */;
 }

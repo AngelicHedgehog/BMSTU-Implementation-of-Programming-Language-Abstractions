@@ -4,14 +4,23 @@ $EXTERN OOP_Code, Map, Inc;
 
 /**
   <OOP_Class 
+    t.Classes
     (class s.Name (s.Name?)
       (fields (s.Name t.ConstExpr)*)?
       (method s.Name (s.Name+) t.LocalVars? e.Code)*
-  )> == t.Function
+  )> == t.Classes t.Function
 */
 $ENTRY OOP_Class {
-  (class s.Name () (fields e.Fields) e.Methods)
-    = (struct s.Name
+  (e.Classes) (class s.Name () (fields e.Fields) e.Methods)
+    = (e.Classes
+        (s.Name
+          (<Map
+            { (method s.MethodName e._) = (s.Name s.MethodName); }
+            e.Methods
+          >)
+        )
+      )
+      (struct s.Name
         ("-" 1)
         e.Fields
       )
@@ -39,8 +48,83 @@ $ENTRY OOP_Class {
         >
       );
   
-  (class s.Name (s.Base) (fields e.Fields) e.Methods)
-    = ;
+  (e.Classes) (class s.Name (s.Base) (fields e.Fields) e.Methods)
+    , e.Classes : e._ (s.Base (e.BaseMethods)) e._
+    , <Map {
+      (s.BaseName s.BaseMethod)
+        , e.Methods : e._ (method s.BaseMethod e._) e._
+        = /* пусто */;
+      (s.BaseName s.BaseMethod) = (s.BaseName s.BaseMethod);
+    } e.BaseMethods> : e.OldMethods
+    , <Map {
+      (s.BaseName s.BaseMethod)
+        , e.Methods : e._ (method s.BaseMethod e._) e._
+        = s.BaseMethod;
+      e._ = /* пусто */;
+    } e.BaseMethods> : e.OverrideMethods
+    , <Map {
+      (method s.NewMethod t.Params e.Body)
+        , e.BaseMethods : e._ (s._ s.NewMethod) e._
+        = /* пусто */;
+      e.Method = e.Method;
+    } e.Methods> : e.NewMethods
+    = (e.Classes (s.Name
+        (e.OldMethods
+          <Map {
+            s.BaseMethod = (s.Name s.BaseMethod);
+          } e.OverrideMethods>
+          <Map {
+            (method s.NewMethod t.Params e.Body) = (s.Name s.NewMethod);
+          } e.NewMethods>
+        )
+      ))
+      (struct s.Name
+        ("-" s.Base)
+        e.Fields
+      )
+      (struct <Implode_Ext <Explode s.Name> '_class__'>
+        ("-" <Implode_Ext <Explode s.Base> '_class__'>)
+        <Map
+          {
+            (method s.MethodName e._) = (s.MethodName 1);
+          }
+          e.NewMethods
+        >
+      )
+      <Map {
+        (method s.MethodName t.Params e.Body)
+          = (function <Implode_Ext <Explode s.Name> '__' <Explode s.MethodName>>
+            t.Params
+            <OOP_Code e.Body>
+          )
+      } e.Methods>
+      (var <Implode_Ext <Explode s.Name> '_vtbl__'>
+        <Implode_Ext <Explode s.Name> '_class__'> "="
+        /* унаследованный метод */
+        <Map
+          {
+            (s.BaseName s.BaseMethod)
+              = <Implode_Ext <Explode s.BaseName> '__' <Explode s.BaseMethod>>;
+          }
+          e.OldMethods
+        >
+        /* переопределённый метод */
+        <Map
+          {
+            s.MethodName
+              = <Implode_Ext <Explode s.Name> '__' <Explode s.MethodName>>;
+          }
+          e.OverrideMethods
+        >
+        /* новый метод */
+        <Map
+          {
+            (method s.MethodName e._)
+              = <Implode_Ext <Explode s.Name> '__' <Explode s.MethodName>>;
+          }
+          e.NewMethods
+        >
+      );
 
-  (class s.Name t.Base e.Methods) = <OOP_Class (class s.Name t.Base (fields) e.Methods)>;
+  t.Classes (class s.Name t.Base e.Methods) = <OOP_Class t.Classes (class s.Name t.Base (fields) e.Methods)>;
 }
