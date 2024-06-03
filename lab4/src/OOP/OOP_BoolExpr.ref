@@ -19,7 +19,7 @@ $ENTRY OOP_BoolExpr {
   (isinstance t.ObjectPtr s.Name)
     = (
       (let ((vtable_let__ 1) (res_let__ 1))
-        (vtable_let__ "=" <OOP_Expr t.ObjectPtr>)
+        (vtable_let__ "=" (L <OOP_Expr t.ObjectPtr>))
         (while (
           ((L vtable_let__) "<>" 0) and
           ((L vtable_let__) "<>" <Implode_Ext <Explode s.Name> '_vtbl__'>)

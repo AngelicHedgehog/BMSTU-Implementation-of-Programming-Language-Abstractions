@@ -14,5 +14,5 @@ $EXTERN OOP_Function, OOP_Class;
 $ENTRY OOP_Definition {
   t.Classes (function e.Function) = t.Classes <OOP_Function (function e.Function)>;
   t.Classes (class e.Class) = <OOP_Class t.Classes (class e.Class)>;
-  t.Classes e.Other = t.Classes e.Other;
+  t.Classes t.Other = t.Classes t.Other;
 }

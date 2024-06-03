@@ -36,6 +36,11 @@
 (class Cat (Animal)
     (fields (Cat_breed 1))
 
+
+    (method getType (self)
+        (return 2)
+    )
+
     (method setBreed (self breed)
         (((L self) "+" Cat_breed) "=" (L breed))
     )
@@ -43,10 +48,24 @@
     (method getBreed (self)
         (return (L ((L self) "+" Cat_breed)))
     )
+)
 
-    (method getType (self)
-        (return 2)
-    )
+
+(class B ()
+  (method ff (self) (return self))
+  (method gg (self) (return self))
+  (method hh (self) (return self))
+  (method kk (self) (return self))
+)
+
+(class D (B)
+  (method gg (self) (return self))
+  (method kk (self) (return self))
+)
+
+(class E (D)
+  (method gg (self) (return self))
+  (method ff (self) (return self))
 )
 
 (function main ()

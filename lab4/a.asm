@@ -63,6 +63,13 @@ GETFP SETSP SETFP
 :_Animal_vtbl__ 
 0 _Animal__setName _Animal__getName _Animal__getType 
 
+:_Cat__getType 
+GETFP GETSP SETFP 
+2 SETRV __Cat__getType JMP 
+:__Cat__getType 
+GETFP SETSP SETFP 
+1 RETN 
+
 :_Cat__setBreed 
 GETFP GETSP SETFP 
 GETFP 2 ADD LOAD 2 ADD GETFP 3 ADD LOAD SAVE 
@@ -77,15 +84,73 @@ GETFP 2 ADD LOAD 2 ADD LOAD SETRV __Cat__getBreed JMP
 GETFP SETSP SETFP 
 1 RETN 
 
-:_Cat__getType 
+:_Cat_vtbl__ 
+_Animal_vtbl__ _Animal__setName _Animal__getName _Cat__getType _Cat__setBreed _Cat__getBreed 
+
+:_B__ff 
 GETFP GETSP SETFP 
-2 SETRV __Cat__getType JMP 
-:__Cat__getType 
+GETFP 2 ADD SETRV __B__ff JMP 
+:__B__ff 
 GETFP SETSP SETFP 
 1 RETN 
 
-:_Cat_vtbl__ 
-_Animal_vtbl__ _Animal__setName _Animal__getName _Cat__getType _Cat__setBreed _Cat__getBreed 
+:_B__gg 
+GETFP GETSP SETFP 
+GETFP 2 ADD SETRV __B__gg JMP 
+:__B__gg 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_B__hh 
+GETFP GETSP SETFP 
+GETFP 2 ADD SETRV __B__hh JMP 
+:__B__hh 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_B__kk 
+GETFP GETSP SETFP 
+GETFP 2 ADD SETRV __B__kk JMP 
+:__B__kk 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_B_vtbl__ 
+0 _B__ff _B__gg _B__hh _B__kk 
+
+:_D__gg 
+GETFP GETSP SETFP 
+GETFP 2 ADD SETRV __D__gg JMP 
+:__D__gg 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_D__kk 
+GETFP GETSP SETFP 
+GETFP 2 ADD SETRV __D__kk JMP 
+:__D__kk 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_D_vtbl__ 
+_B_vtbl__ _B__ff _D__gg _B__hh _D__kk 
+
+:_E__gg 
+GETFP GETSP SETFP 
+GETFP 2 ADD SETRV __E__gg JMP 
+:__E__gg 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_E__ff 
+GETFP GETSP SETFP 
+GETFP 2 ADD SETRV __E__ff JMP 
+:__E__ff 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_E_vtbl__ 
+_D_vtbl__ _E__ff _E__gg _B__hh _D__kk 
 
 :_main 
 GETFP GETSP SETFP 
@@ -140,7 +205,7 @@ GETRV _printInt CALL GETRV DROP
 _newLine CALL GETRV DROP 
 GETFP GETSP SETFP 
 2 PUSHN 
-GETFP 1 SUB GETFP LOAD 2 SUB SAVE 
+GETFP 1 SUB GETFP LOAD 2 SUB LOAD SAVE 
 :_loop_while_0_main 
 GETFP 1 SUB LOAD 
 0 
@@ -177,7 +242,7 @@ _newLine CALL GETRV DROP
 :_exit_if_0_main 
 GETFP GETSP SETFP 
 2 PUSHN 
-GETFP 1 SUB GETFP LOAD 5 SUB SAVE 
+GETFP 1 SUB GETFP LOAD 5 SUB LOAD SAVE 
 :_loop_while_1_main 
 GETFP 1 SUB LOAD 
 0 
@@ -206,15 +271,15 @@ GETFP 2 SUB 0 SAVE
 GETFP 2 SUB LOAD SETRV GETFP SETSP SETFP 
 GETRV 
 1 
-CMP _true_if_2_main JEQ 
-_exit_if_2_main JMP 
+CMP _exit_if_2_main JEQ 
+_true_if_2_main JMP 
 :_true_if_2_main 
 6662 _printInt CALL GETRV DROP 
 _newLine CALL GETRV DROP 
 :_exit_if_2_main 
 GETFP GETSP SETFP 
 2 PUSHN 
-GETFP 1 SUB GETFP LOAD 2 SUB SAVE 
+GETFP 1 SUB GETFP LOAD 2 SUB LOAD SAVE 
 :_loop_while_2_main 
 GETFP 1 SUB LOAD 
 0 
@@ -251,7 +316,7 @@ _newLine CALL GETRV DROP
 :_exit_if_4_main 
 GETFP GETSP SETFP 
 2 PUSHN 
-GETFP 1 SUB GETFP LOAD 5 SUB SAVE 
+GETFP 1 SUB GETFP LOAD 5 SUB LOAD SAVE 
 :_loop_while_3_main 
 GETFP 1 SUB LOAD 
 0 
