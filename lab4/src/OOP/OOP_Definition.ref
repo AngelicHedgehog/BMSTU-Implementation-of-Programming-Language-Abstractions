@@ -1,0 +1,17 @@
+*$FROM src/OOP/OOP_Function.ref
+*$FROM src/OOP/OOP_Class.ref
+$EXTERN OOP_Function, OOP_Class;
+
+/**
+  <OOP_Definition
+      t.Struct
+    | t.Const
+    | t.GlobalVar
+    | t.Function
+    | t.Class> == t.Definition
+*/
+$ENTRY OOP_Definition {
+  (function e.Function) = <OOP_Function (function e.Function)>;
+  (class e.Class) = <OOP_Class (class e.Class)>;
+  e.Other = e.Other;
+}

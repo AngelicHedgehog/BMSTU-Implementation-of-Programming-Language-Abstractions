@@ -1,0 +1,14 @@
+*$FROM src/OOP/OOP_Code.ref
+$EXTERN OOP_Code;
+
+/**
+  <OOP_Class 
+    (class s.Name (s.Name?)
+      (fields (s.Name t.ConstExpr)*)?
+      (method s.Name (s.Name+) t.LocalVars? e.Code)*
+  )> == t.Function
+*/
+$ENTRY OOP_Class {
+  (class s.Name (e.Name) (fields e.Fields) e.Methods) = /* пусто */;
+  (class s.Name (e.Name) e.Methods) = /* пусто */;
+}

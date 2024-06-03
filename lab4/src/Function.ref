@@ -3,7 +3,7 @@
 $EXTERN LocalVars, Code;
 
 /**
-  <Function (function s.Name (s.Name*) t.LocalVars? e.Code)> == t.Globals s.AsmCodeCmd*
+  <Function (t.Globals function s.Name (s.Name*) t.LocalVars? e.Code)> == t.Globals s.AsmCodeCmd*
 */
 $ENTRY Function {
   t.Globals (function s.Name (e.Params) (var e.LocalVars) e.Code)

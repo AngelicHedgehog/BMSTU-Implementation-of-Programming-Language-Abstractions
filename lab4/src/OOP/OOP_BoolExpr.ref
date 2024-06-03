@@ -1,0 +1,24 @@
+*$FROM src/OOP/OOP_Expr.ref
+$EXTERN OOP_Expr;
+
+/**
+  <OOP_BoolExpr
+      TRUE | FALSE
+    | (t.Expr s.RelOp t.Expr)
+    | (not t.BoolExpr)
+    | (t.BoolExpr and t.BoolExpr)
+    | (t.BoolExpr or t.BoolExpr)
+    | (isinstance e.ObjectPtr s.Name)
+  > == t.BoolExpr
+*/
+$ENTRY OOP_BoolExpr {
+  (t.Expr s.RelOp t.Expr) = (<OOP_Expr t.Expr> s.RelOp <OOP_Expr t.Expr>);
+  (not t.BoolExpr) = (not <OOP_BoolExpr t.BoolExpr>);
+  (t.BoolExpr and t.BoolExpr) = (<OOP_BoolExpr t.BoolExpr> and <OOP_BoolExpr t.BoolExpr>);
+  (t.BoolExpr or t.BoolExpr) = (<OOP_BoolExpr t.BoolExpr> or <OOP_BoolExpr t.BoolExpr>);
+
+  (isinstance e.ObjectPtr s.Name) = FALSE;
+
+  e.Other = e.Other;
+}
+

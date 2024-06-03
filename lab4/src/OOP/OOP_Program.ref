@@ -1,0 +1,11 @@
+*$FROM src/OOP/OOP_Definition.ref
+$EXTERN OOP_Definition;
+
+/**
+  <OOP_Program t.Definition*> == e.Program
+*/
+$ENTRY OOP_Program {
+  t.Definition e.Definitions
+    = <OOP_Definition t.Definition> <OOP_Program e.Definitions>;
+  /* пусто */ = /* пусто */;
+}
