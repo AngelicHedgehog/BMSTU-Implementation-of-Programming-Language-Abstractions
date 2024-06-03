@@ -24,7 +24,16 @@ $ENTRY OOP_Expr {
   (t.Expr "=" t.Expr) = (<OOP_Expr t.Expr> "=" <OOP_Expr t.Expr>);
   (let t.LocalVars e.Code t.Expr) = (let t.LocalVars <OOP_Code e.Code> <OOP_Expr t.Expr>);
 
-  (mcall t.Expr s.Name e.Exprs) = 0;
+  (mcall t.Object s.Method e.Args)
+    = (let ((object_let__ 1))
+        (object_let__ "=" <OOP_Expr t.Object>)
+        (call
+          (L (
+            (L (L object_let__)) "+" s.Method
+          ))
+          (L object_let__) e.Args
+        )
+      );
 
   e.Other = e.Other;
 }
