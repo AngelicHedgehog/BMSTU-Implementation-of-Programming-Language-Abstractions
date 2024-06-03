@@ -38,7 +38,8 @@ $ENTRY OOP_Class {
           )
       } e.Methods>
       (var <Implode_Ext <Explode s.Name> '_vtbl__'>
-        <Implode_Ext <Explode s.Name> '_class__'> "="
+        (<Implode_Ext <Explode s.Name> '_class__'> "+" 1) "="
+        0
         <Map
           {
             (method s.MethodName e._)
@@ -99,7 +100,8 @@ $ENTRY OOP_Class {
           )
       } e.Methods>
       (var <Implode_Ext <Explode s.Name> '_vtbl__'>
-        <Implode_Ext <Explode s.Name> '_class__'> "="
+        (<Implode_Ext <Explode s.Name> '_class__'> "+" 1) "="
+        <Implode_Ext <Explode s.Base> '_vtbl__'>
         /* унаследованный метод */
         <Map
           {

@@ -28,7 +28,7 @@ $ENTRY OOP_Expr {
         (object_let__ "=" <OOP_Expr t.Object>)
         (call
           (L (
-            (L (L object_let__)) "+" s.Method
+            ((L (L object_let__)) "+" 1) "+" s.Method
           ))
           (L object_let__) e.Args
         )

@@ -23,7 +23,7 @@ $ENTRY BoolExpr {
       e.FLabel JMP;
 
   t.Globals t.Locals (e.TLabel) (e.FLabel) (not t.BoolExpr)
-    = <BoolExpr (e.FLabel) (e.TLabel) t.BoolExpr>;
+    = <BoolExpr t.Globals t.Locals (e.FLabel) (e.TLabel) t.BoolExpr>;
 
   t.Globals (e.LocalsL (_bool_count s.BoolNum) e.LocalsR) (e.TLabel) (e.FLabel) (t.BoolExprL and t.BoolExprR)
     , (e.LocalsL (_bool_count <Add s.BoolNum 1>) e.LocalsR) : t.Locals1
