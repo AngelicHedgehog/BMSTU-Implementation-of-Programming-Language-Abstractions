@@ -12,7 +12,7 @@ $ENTRY Function {
       '+' = s.ParamCount RETN;
       e._ = JMP;
     } : e.EpilogCode
-    , <LocalVars e.LocalVars> : e.Locals1 '|' e.AllocateCode
+    , <LocalVars t.Globals e.LocalVars> : e.Locals1 '|' e.AllocateCode
     , e.LocalParams e.Locals1
       (_func_name s.Name)
       (_if_count 0)

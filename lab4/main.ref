@@ -5,10 +5,10 @@ $EXTERN LoadExpr, SaveFile, Program, OOP_Program;
 
 $ENTRY Go {
   /* пусто */ = <SaveFile (<Arg 2>) (
-*    <Program
+    <Program
       <OOP_Program
         <LoadExpr <Arg 1>>
       >
-*    >
+    >
   )>;
 }

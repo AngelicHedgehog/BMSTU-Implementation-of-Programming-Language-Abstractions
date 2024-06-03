@@ -21,7 +21,7 @@ $EXTERN Expr, BoolExpr, Code, Name, LocalVars, Map;
 */
 $ENTRY Statement {
   t.Globals (e.Locals) (block (e.LocalVars) e.Code)
-    , <LocalVars e.LocalVars> : {
+    , <LocalVars t.Globals e.LocalVars> : {
       e.LocalVars1_ '|' s.AllocateSize_ PUSHN '\n' = e.LocalVars1_ s.AllocateSize_;
       '|' = 0;
     } : e.LocalVars1 s.AllocateSize
@@ -49,6 +49,9 @@ $ENTRY Statement {
 
   t.Globals t.Locals (call t.Expr e.Exprs)
     = <Expr t.Globals t.Locals (call t.Expr e.Exprs)> DROP '\n';
+
+  t.Globals t.Localst (let (e.LocalVars) e.Code t.Expr)
+    = <Expr t.Globals t.Localst (let (e.LocalVars) e.Code t.Expr)> DROP '\n';
 
   t.Globals t.Locals (return t.Expr)
     , <Name t.Locals _func_name> : SUCC s.FuncName

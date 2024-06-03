@@ -16,6 +16,10 @@ $ENTRY ConstExpr {
     , <Name t.Globals s.Name> : SUCC e.Val
     = e.Val;
 
+  t.Globals s.Name
+    , <Type s.Name> : 'W' e._
+    = <Implode_Ext '_' <Explode s.Name>>;
+
   t.Globals s.NUMBER = s.NUMBER;
 
   t.Globals ("-" t.ConstExpr) = <Sub 0 <ConstExpr t.Globals t.ConstExpr>>;

@@ -6,14 +6,14 @@ $EXTERN Name, ConstExpr;
   <LocalVars (var (s.Name t.ConstExpr)*)> == t.Locals e.AllocateCode
 */
 $ENTRY LocalVars {
-  /* пусто */ = '|';
-  e.LocalVars = <_LocalVars 0 e.LocalVars> PUSHN '\n';
+  t.Globals = '|';
+  t.Globals e.LocalVars = <_LocalVars t.Globals 0 e.LocalVars> PUSHN '\n';
 }
 
 _LocalVars {
-  s.MemShift = '|' s.MemShift;
-  s.MemShift (s.VarName s.VarSize) e.LocalVars
-    , <Add s.MemShift s.VarSize> : s.VarShift
+  t.Globals s.MemShift = '|' s.MemShift;
+  t.Globals s.MemShift (s.VarName s.VarSize) e.LocalVars
+    , <Add s.MemShift <ConstExpr t.Globals s.VarSize>> : s.VarShift
     = (s.VarName <Sub 0 s.VarShift> (GETFP))
-      <_LocalVars s.VarShift e.LocalVars>;
+      <_LocalVars t.Globals s.VarShift e.LocalVars>;
 }

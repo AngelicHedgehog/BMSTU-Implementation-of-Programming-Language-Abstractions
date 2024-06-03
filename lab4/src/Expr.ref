@@ -28,7 +28,7 @@ $ENTRY Expr {
       e.L e.R SWAP OVER SAVE;
   
   t.Globals (e.Locals) (let (e.LocalVars) e.Code t.Expr)
-    , <LocalVars e.LocalVars> : {
+    , <LocalVars t.Globals e.LocalVars> : {
       e.LocalVars1_ '|' s.AllocateSize_ PUSHN '\n' = e.LocalVars1_ s.AllocateSize_;
       '|' = 0;
     } : e.LocalVars1 s.AllocateSize
