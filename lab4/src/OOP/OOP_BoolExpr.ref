@@ -12,10 +12,10 @@ $EXTERN OOP_Expr;
   > == t.BoolExpr
 */
 $ENTRY OOP_BoolExpr {
-  (t.Expr s.RelOp t.Expr) = (<OOP_Expr t.Expr> s.RelOp <OOP_Expr t.Expr>);
+  (t.ExprL s.RelOp t.ExprR) = (<OOP_Expr t.ExprL> s.RelOp <OOP_Expr t.ExprR>);
   (not t.BoolExpr) = (not <OOP_BoolExpr t.BoolExpr>);
-  (t.BoolExpr and t.BoolExpr) = (<OOP_BoolExpr t.BoolExpr> and <OOP_BoolExpr t.BoolExpr>);
-  (t.BoolExpr or t.BoolExpr) = (<OOP_BoolExpr t.BoolExpr> or <OOP_BoolExpr t.BoolExpr>);
+  (t.BoolExprL and t.BoolExprR) = (<OOP_BoolExpr t.BoolExprL> and <OOP_BoolExpr t.BoolExprR>);
+  (t.BoolExprL or t.BoolExprR) = (<OOP_BoolExpr t.BoolExprL> or <OOP_BoolExpr t.BoolExprR>);
 
   (isinstance e.ObjectPtr s.Name) = FALSE;
 

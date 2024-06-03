@@ -9,6 +9,6 @@ $EXTERN OOP_Code;
   )> == t.Function
 */
 $ENTRY OOP_Class {
-  (class s.Name (e.Name) (fields e.Fields) e.Methods) = /* пусто */;
-  (class s.Name (e.Name) e.Methods) = /* пусто */;
+  (class s.Name (e.Base) (fields e.Fields) e.Methods) = /* пусто */;
+  (class s.Name (e.Base) e.Methods) = /* пусто */;
 }

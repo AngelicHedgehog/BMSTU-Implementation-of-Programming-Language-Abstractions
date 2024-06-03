@@ -1,1 +1,1 @@
-(function main ()(block ((point 2 ))(point = Point2_vtbl__ )(call printInt (let ((object_let__ 1 ))(object_let__ = point )(call (L ((L (L object_let__ ))+ getX ))(L object_let__ )))))(return 0 ))
+(function main ()(block ((point 2 )(ret 1 ))(point = Point2_vtbl__ )(ret = (let ((object_let__ 1 ))(object_let__ = point )(call (L ((L (L object_let__ ))+ setY ))(L object_let__ )10 )))(call printInt (let ((object_let__ 1 ))(object_let__ = point )(call (L ((L (L object_let__ ))+ getX ))(L object_let__ )))))(return 0 ))

@@ -19,9 +19,9 @@ $EXTERN OOP_Code, Map;
 $ENTRY OOP_Expr {
   (L t.Expr) = (L <OOP_Expr t.Expr>);
   ("-" t.Expr) = ("-" <OOP_Expr t.Expr>);
-  (t.Expr s.BinOp t.Expr) = (<OOP_Expr t.Expr> s.BinOp <OOP_Expr t.Expr>);
+  (t.ExprL s.BinOp t.ExprR) = (<OOP_Expr t.ExprL> s.BinOp <OOP_Expr t.ExprR>);
   (call t.Expr e.Exprs) = (call <Map OOP_Expr t.Expr e.Exprs>);
-  (t.Expr "=" t.Expr) = (<OOP_Expr t.Expr> "=" <OOP_Expr t.Expr>);
+  (t.ExprL "=" t.ExprR) = (<OOP_Expr t.ExprL> "=" <OOP_Expr t.ExprR>);
   (let t.LocalVars e.Code t.Expr) = (let t.LocalVars <OOP_Code e.Code> <OOP_Expr t.Expr>);
 
   (mcall t.Object s.Method e.Args)

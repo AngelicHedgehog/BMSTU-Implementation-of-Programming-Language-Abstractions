@@ -11,8 +11,9 @@
 )
 
 (function main ()
-    (block ((point 2))
+    (block ((point 2) (ret 1))
         (init point Point2)
+        (ret "=" (mcall point setY 10))
         (call printInt (mcall point getX))
     )
     (return 0)

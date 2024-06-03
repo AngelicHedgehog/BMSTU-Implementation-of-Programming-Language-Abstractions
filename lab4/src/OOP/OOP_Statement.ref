@@ -18,11 +18,11 @@ $EXTERN OOP_Expr, OOP_BoolExpr, OOP_Code, Map;
   > == t.Statement
 */
 $ENTRY OOP_Statement {
-  (t.Expr "=" t.Expr) = (<OOP_Expr t.Expr> "=" <OOP_Expr t.Expr>);
-  (call t.Expr e.Expr) = (call <Map OOP_Expr t.Expr e.Expr>);
+  (t.ObjectPtr "=" t.Expr) = (<OOP_Expr t.ObjectPtr> "=" <OOP_Expr t.Expr>);
+  (call t.Expr e.Args) = (call <Map OOP_Expr t.Expr e.Args>);
   (return t.Expr) = (return <OOP_Expr t.Expr>);
-  (if t.BoolExpr e.Code else e.Code)
-    = (if <OOP_BoolExpr t.BoolExpr> <OOP_Code e.Code> else <OOP_Code e.Code>);
+  (if t.BoolExpr e.CodeT else e.CodeF)
+    = (if <OOP_BoolExpr t.BoolExpr> <OOP_Code e.CodeT> else <OOP_Code e.CodeF>);
   (if t.BoolExpr e.Code) = (if <OOP_BoolExpr t.BoolExpr> <OOP_Code e.Code>);
   (while t.BoolExpr e.Code) = (while <OOP_BoolExpr t.BoolExpr> <OOP_Code e.Code>);
   (block t.LocalVars e.Code) = (block t.LocalVars <OOP_Code e.Code>);
