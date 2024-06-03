@@ -1,0 +1,140 @@
+GETSP _MEMORY_SIZE SWAP SAVE 
+_main CALL 
+GETRV HALT 
+:_MEMORY_SIZE 0 
+:_PROGRAM_SIZE PROGRAM_SIZE 
+
+:_in 
+GETFP GETSP SETFP 
+IN SETRV __in JMP 
+:__in 
+GETFP SETSP SETFP 
+JMP 
+
+:_out 
+GETFP GETSP SETFP 
+GETFP 2 ADD LOAD OUT 
+:__out 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_getFP 
+GETFP GETSP SETFP 
+GETFP SETRV __getFP JMP 
+:__getFP 
+GETFP SETSP SETFP 
+JMP 
+
+:_halt 
+GETFP GETSP SETFP 
+GETFP 2 ADD LOAD HALT 
+:__halt 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_printInt 
+GETFP GETSP SETFP 
+GETFP 2 ADD LOAD 
+10 
+CMP _true_if_0_printInt JGE 
+_exit_if_0_printInt JMP 
+:_true_if_0_printInt 
+GETFP 2 ADD LOAD 10 DIV _printInt CALL GETRV DROP 
+:_exit_if_0_printInt 
+GETFP 2 ADD LOAD 10 MOD 48 ADD _out CALL GETRV DROP 
+:__printInt 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_newLine 
+GETFP GETSP SETFP 
+10 _out CALL GETRV DROP 
+:__newLine 
+GETFP SETSP SETFP 
+JMP 
+
+:_nearSquare 
+GETFP GETSP SETFP 
+GETFP 2 ADD LOAD 
+3 
+CMP _true_if_0_nearSquare JLE 
+_false_if_0_nearSquare JMP 
+:_true_if_0_nearSquare 
+GETFP 2 ADD 0 SAVE 
+_exit_if_0_nearSquare JMP 
+:_false_if_0_nearSquare 
+GETFP 2 ADD GETFP 2 ADD LOAD 1 ADD SAVE 
+:_exit_if_0_nearSquare 
+GETFP 2 ADD LOAD GETFP 2 ADD LOAD MUL SETRV __nearSquare JMP 
+:__nearSquare 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_gcd 
+GETFP GETSP SETFP 
+1 PUSHN 
+GETFP GETSP SETFP 
+5 PUSHN 
+:_loop_while_0_gcd 
+GETFP LOAD 3 ADD LOAD 
+0 
+CMP _true_while_0_gcd JNE 
+_exit_while_0_gcd JMP 
+:_true_while_0_gcd 
+GETFP 5 SUB GETFP LOAD 2 ADD LOAD GETFP LOAD 2 ADD GETFP LOAD 3 ADD LOAD SWAP OVER SAVE MOD SAVE 
+GETFP LOAD 3 ADD GETFP 5 SUB LOAD SAVE 
+_loop_while_0_gcd JMP 
+:_exit_while_0_gcd 
+GETFP SETSP SETFP 
+GETFP 1 SUB GETFP 2 ADD LOAD SAVE 
+GETFP 1 SUB LOAD SETRV __gcd JMP 
+:__gcd 
+GETFP SETSP SETFP 
+2 RETN 
+
+:_main 
+GETFP GETSP SETFP 
+3 _nearSquare CALL GETRV _printInt CALL GETRV DROP 
+_newLine CALL GETRV DROP 
+4 _nearSquare CALL GETRV _printInt CALL GETRV DROP 
+_newLine CALL GETRV DROP 
+GETFP GETSP SETFP 
+2 PUSHN 
+GETFP 1 SUB 1 SAVE 
+GETFP 2 SUB GETFP GETSP SETFP 
+2 PUSHN 
+GETFP 1 SUB 49 SAVE 
+GETFP 2 SUB 0 SAVE 
+:_loop_while_0_main 
+GETFP 1 SUB LOAD 
+GETFP 2 SUB LOAD _nearSquare CALL GETRV 
+CMP _true_while_0_main JGT 
+_exit_while_0_main JMP 
+:_true_while_0_main 
+GETFP 2 SUB GETFP 2 SUB LOAD GETFP LOAD 1 SUB LOAD ADD SAVE 
+_loop_while_0_main JMP 
+:_exit_while_0_main 
+GETFP 2 SUB LOAD _printInt CALL GETRV DROP 
+_newLine CALL GETRV DROP 
+GETFP 2 SUB LOAD SETRV GETFP SETSP SETFP 
+GETRV SAVE 
+:_loop_while_1_main 
+GETFP 1 SUB LOAD 
+GETFP 2 SUB LOAD 
+CMP _true_while_1_main JLT 
+_exit_while_1_main JMP 
+:_true_while_1_main 
+GETFP 1 SUB GETFP 1 SUB LOAD 1 ADD SAVE 
+_loop_while_1_main JMP 
+:_exit_while_1_main 
+GETFP 1 SUB LOAD _printInt CALL GETRV DROP 
+_newLine CALL GETRV DROP 
+GETFP 1 SUB LOAD SETRV GETFP SETSP SETFP 
+GETRV 4 _gcd CALL GETRV _printInt CALL GETRV DROP 
+_newLine CALL GETRV DROP 
+0 SETRV __main JMP 
+:__main 
+GETFP SETSP SETFP 
+JMP 
+
+

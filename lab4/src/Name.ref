@@ -1,0 +1,7 @@
+/**
+  <Name t.Names s.WORD> == s.VAL
+*/
+$ENTRY Name {
+  (e._ (s.WORD e.VAL) e._) s.WORD = SUCC e.VAL;
+  e._ = ERR;
+}

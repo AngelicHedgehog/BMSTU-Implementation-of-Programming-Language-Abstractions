@@ -1,0 +1,33 @@
+*$FROM src/Name.ref
+*$FROM src/ConstExpr.ref
+$EXTERN Name, ConstExpr;
+
+/**
+  <ConstExpr
+    t.Globals
+      s.Name
+    | s.NUMBER
+    | ("-" t.ConstExpr)
+    | (t.ConstExpr s.BinOp t.ConstExpr)
+  > == s.ConstVal
+*/
+$ENTRY ConstExpr {
+  t.Globals s.Name
+    , <Name t.Globals s.Name> : SUCC e.Val
+    = e.Val;
+
+  t.Globals s.NUMBER = s.NUMBER;
+
+  t.Globals ("-" t.ConstExpr) = <Sub 0 <ConstExpr t.Globals t.ConstExpr>>;
+  
+  t.Globals (t.ConstExprL s.BinOp t.ConstExprR)
+    , <ConstExpr t.Globals t.ConstExprL> : s.LeftVal
+    , <ConstExpr t.Globals t.ConstExprR> : s.RightVal
+    , s.BinOp : {
+      "+" = <Add s.LeftVal s.RightVal>;
+      "-" = <Sub s.LeftVal s.RightVal>;
+      "*" = <Mul s.LeftVal s.RightVal>;
+      "/" = <Div s.LeftVal s.RightVal>;
+      "%" = <Mod s.LeftVal s.RightVal>;
+    };
+}

@@ -1,0 +1,13 @@
+/**
+  <BinOp "+" | "-" | "*" | "/" | "%" | "&" | "|" | "~"> == s.AsmCodeCmd
+*/
+$ENTRY BinOp {
+  "+" = ADD;
+  "-" = SUB;
+  "*" = MUL;
+  "/" = DIV;
+  "%" = MOD;
+  "&" = BITAND;
+  "|" = BITOR;
+  "~" = BITNOT;
+}

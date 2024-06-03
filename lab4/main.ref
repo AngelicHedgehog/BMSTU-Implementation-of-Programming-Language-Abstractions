@@ -1,0 +1,7 @@
+*$FROM LibraryEx
+*$FROM src/Program.ref
+$EXTERN LoadExpr, SaveFile, Program;
+
+$ENTRY Go {
+  /* пусто */ = <SaveFile (<Arg 2>) (<Program <LoadExpr <Arg 1>>>)>;
+}
