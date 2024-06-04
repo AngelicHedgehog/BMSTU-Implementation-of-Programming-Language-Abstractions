@@ -1,5 +1,5 @@
 // константы
-`define MAX_LEXEM_COUNT 2048
+`define MAX_LEXEM_COUNT 4096
 `define MAX_LEXEM_SIZE  32
 `define MAX_LABELS      512
 `define MEMMORY_LIMIT   1_000_000

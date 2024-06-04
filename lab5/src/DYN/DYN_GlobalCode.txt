@@ -10,49 +10,56 @@
 (var heap_order__ 1 "=" min_block_order__)
 (var heap_start__ 1)
 
+(const block_prev__ "=" 0)
+(const block_next__ "=" 1)
+(const block_size__ "=" 2)
+(const block_buzy__ "=" 3)
+
+(const ref_links_count__ "=" 1)
+(const ref_refs_count__ "=" 2)
+
 (function getHeapBlock__ (size)
     (return ((L PROGRAM_SIZE) "+" ((L size) "-" min_block_order__)))
 )
 (function getNextBlock__ (block)
-    (return (L ((L block) "+" 1)))
+    (return (L ((L block) "+" block_next__)))
 )
 
 (function unlinkBlock__ (block)
     (var (prevBlock 1) (nextBlock 1))
 
-    (prevBlock "=" (L (L block)))
-    (nextBlock "=" (L ((L block) "+" 1)))
+    (prevBlock "=" (L ((L block) "+" block_prev__)))
+    (nextBlock "=" (L ((L block) "+" block_next__)))
 
     (if ((L prevBlock) "<>" 0)
-        (((L prevBlock) "+" 1) "=" (L nextBlock))
+        (((L prevBlock) "+" block_next__) "=" (L nextBlock))
     else
-        ((call getHeapBlock__ (L ((L block) "+" 2))) "=" (L nextBlock))
+        ((call getHeapBlock__ (L ((L block) "+" block_size__))) "=" (L nextBlock))
     )
     (if ((L nextBlock) "<>" 0)
-        ((L nextBlock) "=" (L prevBlock))
+        (((L nextBlock) "+" block_prev__) "=" (L prevBlock))
     )
 
-    (((L block) "+" 3) "=" 1)
+    (((L block) "+" block_buzy__) "=" 1)
 )
 
 (function linkBlocks__ (prevBlock nextBlock)
     (if ((L prevBlock) "<>" 0)
-        (((L prevBlock) "+" 1) "=" (L nextBlock))
+        (((L prevBlock) "+" block_next__) "=" (L nextBlock))
     )
     (if ((L nextBlock) "<>" 0)
-        ((L nextBlock) "=" (L prevBlock))
+        (((L nextBlock) "+" block_prev__) "=" (L prevBlock))
     )
 )
 
 (function insertBlock__ (block)
     (var (listPtr 1))
 
-    (listPtr "=" (call getHeapBlock__ (L ((L block) "+" 2))))
+    (listPtr "=" (call getHeapBlock__ (L ((L block) "+" block_size__))))
 
     (call linkBlocks__ (L block) (L (L listPtr)))
-    ((L block) "=" 0)
-    (((L block) "+" 3) "=" 0)
-    (((L block) "+" 4) "=" 0)
+    (((L block) "+" block_prev__) "=" 0)
+    (((L block) "+" block_buzy__) "=" 0)
     ((L listPtr) "=" (L block))
 )
 
@@ -61,11 +68,11 @@
 
     (call unlinkBlock__ (L block))
 
-    (blockOrder "=" ((L ((L block) "+" 2)) "-" 1))
+    (blockOrder "=" ((L ((L block) "+" block_size__)) "-" 1))
 
     (newBlock "=" ((L block) "+" (1 "<<" (L blockOrder))))
-    (((L block) "+" 2) "=" (L blockOrder))
-    (((L newBlock) "+" 2) "=" (L blockOrder))
+    (((L block) "+" block_size__) "=" (L blockOrder))
+    (((L newBlock) "+" block_size__) "=" (L blockOrder))
 
     (call insertBlock__ (L newBlock))
     (call insertBlock__ (L block))
@@ -74,25 +81,27 @@
 (function unionBlock__ (block)
     (var (buddy 1))
 
-    (if ((L ((L block) "+" 3)) "==" 1)
+    (if ((L ((L block) "+" block_buzy__)) "==" 1)
         (return 0)
     )
 
-    (if ((((L block) "-" (L heap_start__)) "&" (1 "<<" (L ((L block) "+" 2)))) "==" 0)
-        (buddy "=" ((L block) "+" (1 "<<" (L ((L block) "+" 2)))))
+    (if ((((L block) "-" (L heap_start__)) "&" (1 "<<" (L ((L block) "+" block_size__)))) "==" 0)
+        (buddy "=" ((L block) "+" (1 "<<" (L ((L block) "+" block_size__)))))
     else
         (buddy "=" (L block))
-        (block "=" ((L block) "-" (1 "<<" (L ((L block) "+" 2)))))
+        (block "=" ((L block) "-" (1 "<<" (L ((L block) "+" block_size__)))))
     )
 
-    (if (((L ((L buddy) "+" 3)) "==" 1) or ((L ((L block) "+" 2)) "<>" (L ((L buddy) "+" 2))))
+    (if (((L ((L buddy) "+" block_buzy__)) "==" 1) or
+        ((L ((L block) "+" block_size__)) "<>" (L ((L buddy) "+" block_size__)))
+    )
         (return 0)
     )
 
     (call unlinkBlock__ (L block))
     (call unlinkBlock__ (L buddy))
     
-    (call inc__ ((L block) "+" 2))
+    (call inc__ ((L block) "+" block_size__))
     (call insertBlock__ (L block))
 
     (call unionBlock__ (L block))
@@ -101,8 +110,8 @@
 (function allocBlock__ (size)
     (var (r 1) (n 1) (block 1))
 
-    (r "=" 2)
-    (while ((L size) ">" ((1 "<<" (L r)) "-" 4))
+    (r "=" min_block_order__)
+    (while ((L size) ">" ((1 "<<" (L r)) "-" (1 "<<" min_block_order__)))
         (call inc__ r)
     )
 
@@ -122,12 +131,14 @@
     (block "=" (L (call getHeapBlock__ (L r))))
 
     (call unlinkBlock__ (L block))
-    (((L block) "+" 4) "=" 1)
-    (return ((L block) "+" 5))
+    (block "=" ((L block) "+" (1 "<<" min_block_order__)))
+    (((L block) "-" ref_links_count__) "=" 1)
+    (((L block) "-" ref_refs_count__) "=" 0)
+    (return (L block))
 )
 
 (function deallocBlock__ (block)
-    (block "=" ((L block) "-" 5))
+    (block "=" ((L block) "-" (1 "<<" min_block_order__)))
     (call insertBlock__ (L block))
     (call unionBlock__ (L block))
 )
@@ -172,20 +183,28 @@
 )
 
 (class DynVarBase__ ()
-    (method delete (self)
+    (method delete__ (self)
     )
 )
 
 (function refInc__ (ref)
     (if ((L ref) "<>" 0)
-        (call inc__ ((L ref) "-" 1))
+        (call inc__ ((L ref) "-" ref_links_count__))
     )
 )
 
 (function refDec__ (ref)
     (if ((L ref) "<>" 0)
-        (call dec__ ((L ref) "-" 1))
-        (if ((L ((L ref) "-" 1)) "<=" 0)
+        (call dec__ ((L ref) "-" ref_links_count__))
+        (if ((L ((L ref) "-" ref_links_count__)) "==" 0)
+            (block ((i 1) (refcount 1))
+                (refcount "=" (L ((L ref) "-" ref_refs_count__)))
+                (i "=" 0)
+                (while ((L i) "<>" (L refcount))
+                    (call refDec__ (L ((L ref) "+" (L i))))
+                    (call inc__ i)
+                )
+            )
             (call deallocBlock__ (L ref))
         )
     )

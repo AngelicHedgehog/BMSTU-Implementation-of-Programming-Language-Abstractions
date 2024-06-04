@@ -16,11 +16,11 @@ $EXTERN DYN_Function, DYN_GlobalRefs, DYN_DynVarType, DYN_Class, LoadExpr;
     | t.Class> == t.Definition
 */
 $ENTRY DYN_Definition {
-  (function main t.Params (var) e.Body)
+  (function main t.Params (var e.Vars) e.Body)
     = <DYN_Function
-        (function main t.Params (var)
-        <LoadExpr 'src/DYN/DYN_MainFCode.txt'>
-        e.Body)
+        (function main t.Params (var e.Vars)
+          <LoadExpr 'src/DYN/DYN_MainFCode.txt'>
+          e.Body)
       >;
   (function main t.Params e.Body)
     = <DYN_Definition (function main t.Params (var) e.Body)>;

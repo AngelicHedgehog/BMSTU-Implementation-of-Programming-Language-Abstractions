@@ -44,21 +44,42 @@ $ENTRY DYN_Statement {
         )
       );
 
-  t.LocalRefs (t.Expr ":-" t.Expr) = ((L <DYN_Expr t.Expr>) "=" <DYN_Expr t.Expr>);
+  t.LocalRefs (t.Var ":-" (call e.Args))
+  = (block ((blockVar__ 1) (blockAddr__ 1))
+      (blockAddr__ "=" <DYN_Expr (call e.Args)>)
+      (blockVar__ "=" <DYN_Expr t.Var>)
+      (call refDec__ (L (L blockVar__)))
+      ((L blockVar__) "=" (L blockAddr__))
+    );
 
-  t.LocalRefs (gc-alloc t.Expr s.Name) = (<DYN_Expr t.Expr> "=" (call allocBlock__ s.Name));
+  t.LocalRefs (t.Var ":-" t.Addr)
+    = (block ((blockVar__ 1) (blockAddr__ 1))
+        (blockAddr__ "=" <DYN_Expr t.Addr>)
+        (blockVar__ "=" <DYN_Expr t.Var>)
+        (call refInc__ (L blockAddr__))
+        (call refDec__ (L (L blockVar__)))
+        ((L blockVar__) "=" (L blockAddr__))
+      );
+
+  t.LocalRefs (gc-alloc t.Expr s.Name)
+    = (block ((ref 1))
+        (ref "=" <DYN_Expr t.Expr>)
+        (call refDec__ (L (L ref)))
+        ((L ref) "=" (call allocBlock__ s.Name))
+        (((L (L ref)) "-" ref_refs_count__) "=" <Implode_Ext <Explode s.Name> '_refcount__'>)
+      );
 
   (e.LocalRefs) (ref-return t.Expr)
     = (return
-      (let ((let_ret__ 1))
-        (let_ret__ "=" <DYN_Expr t.Expr>)
-        (call refInc__ (L let_ret__))
-        <Map {
-          s.LocalRef = (call refDec__ (L s.LocalRef));
-        } e.LocalRefs>
-        (L let_ret__)
-      )
-    );
+        (let ((let_ret__ 1))
+          (let_ret__ "=" <DYN_Expr t.Expr>)
+          (call refInc__ (L let_ret__))
+          <Map {
+            s.LocalRef = (call refDec__ (L s.LocalRef));
+          } e.LocalRefs>
+          (L let_ret__)
+        )
+      );
   
   t.LocalRefs e.Other = e.Other
 }

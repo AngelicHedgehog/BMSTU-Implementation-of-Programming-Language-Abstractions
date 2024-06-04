@@ -1,37 +1,56 @@
+(dynvar LinkedListNode
+    (refs LLN_next)
+    (LLN_value 1)
+)
 
-(class Animal ()
-    (fields (Animal_name 1))
+(function genNode (val)
+    (var (refs list))
+    
+    (gc-alloc list LinkedListNode)
 
-    (method setName (self name)
-        (((L self) "+" Animal_name) "=" (L name))
+    (((L list) "+" LLN_next) "=" 0)
+    (((L list) "+" LLN_value) "=" (L val))
+
+    (ref-return (L list))
+)
+
+(function linkNodes (node1 node2)
+    (((L node1) "+" LLN_next) ":-" (L node2))
+)
+
+(function printLinkedList (linkedList)
+    (while ((L linkedList) "<>" 0)
+        (call printInt__ (L ((L linkedList) "+" LLN_value)))
+        (call space__)
+        (linkedList "=" (L ((L linkedList) "+" LLN_next)))
     )
-
-    (method getName (self)
-        (return (L ((L self) "+" Animal_name)))
-    )
-
-    (method getType (self)
-        (return 1)
-    )
+    (call newLine__)
 )
 
 (function main ()
+    (var (refs list node1 node2 node3))
+    (call printHeap__)
 
-    (block ((block1 1) (block2 1) (block3 1))
-        (call printHeap__)
-        (block2 "=" (call allocBlock__ 500))
-        (call printHeap__)
-        (block3 "=" (call allocBlock__ 25))
-        (call printHeap__)
-        (block1 "=" (call allocBlock__ 5))
-        (call printHeap__)
-        (call deallocBlock__ (L block2))
-        (call printHeap__)
-        (call deallocBlock__ (L block3))
-        (call printHeap__)
-        (call deallocBlock__ (L block1))
-        (call printHeap__)
-    )
 
+    (node1 ":-" (call genNode 100500))
+    (node2 ":-" (call genNode 1501))
+    (node3 ":-" (call genNode 666))
+    (call linkNodes (L node1) (L node2))
+    (call linkNodes (L node2) (L node3))
+
+    (list ":-" (L node2))
+
+    (call printLinkedList (L node1))
+    (call printLinkedList (L node2))
+    (call printLinkedList (L node3))
+    (call printLinkedList (L list))
+
+    (node1 ":-" 0)
+    (node2 ":-" 0)
+    (node3 ":-" 0)
+    (list ":-" 0)
+
+
+    (call printHeap__)
     (return 0)
 )

@@ -1,14 +1,20 @@
 *$FROM src/DYN/DYN_LocalVars.ref
 *$FROM src/DYN/DYN_Code.ref
-$EXTERN DYN_LocalVars, DYN_Code;
+*$FROM LibraryEx
+$EXTERN DYN_LocalVars, DYN_Code, Map;
 
 /**
   <DYN_Function (function s.Name (s.Name*) t.LocalVars? e.Code)> == t.Function
 */
 $ENTRY DYN_Function {
   (function s.Name t.Params (var e.LocalVars) e.Code)
-    , <DYN_LocalVars (var e.LocalVars)> : t.LocalRefs e.LocalVars
-    = (function s.Name t.Params  <DYN_Code t.LocalRefs e.Code (return 0)>);
+    , <DYN_LocalVars (var e.LocalVars)> : (e.LocalRefs) t.LocalVars_
+    = (function s.Name t.Params t.LocalVars_
+        <Map {
+          s.LocalRef = (s.LocalRef "=" 0);
+        } e.LocalRefs>
+        <DYN_Code (e.LocalRefs) e.Code (return 0)>
+      );
 
   (function s.Name t.Params e.Code)
     = (function s.Name t.Params <DYN_Code () e.Code (return 0)>);
