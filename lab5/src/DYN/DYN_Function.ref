@@ -1,0 +1,14 @@
+*$FROM src/DYN/DYN_LocalVars.ref
+*$FROM src/DYN/DYN_Code.ref
+$EXTERN DYN_LocalVars, DYN_Code;
+
+/**
+  <DYN_Function (function s.Name (s.Name*) t.LocalVars? e.Code)> == t.Function
+*/
+$ENTRY DYN_Function {
+  (function s.Name t.Params (var e.LocalVars) e.Code)
+    = (function s.Name t.Params <DYN_LocalVars (var e.LocalVars)> <DYN_Code e.Code>);
+
+  (function s.Name t.Params e.Code)
+    = (function s.Name t.Params <DYN_Code e.Code>);
+}

@@ -1,0 +1,9 @@
+/**
+  <DYN_GlobalRefs (refs s.Name*)> == t.GlobalVar*
+*/
+$ENTRY DYN_GlobalRefs {
+    (refs s.Name e.Names)
+      = (var s.Name 1 "=" 0)
+        <DYN_GlobalRefs (refs e.Names)>;
+    (refs) = /* пусто */;
+}

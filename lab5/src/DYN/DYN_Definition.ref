@@ -1,0 +1,31 @@
+*$FROM src/DYN/DYN_Function.ref
+*$FROM src/DYN/DYN_GlobalRefs.ref
+*$FROM src/DYN/DYN_DynVarType.ref
+*$FROM LibraryEx
+$EXTERN DYN_Function, DYN_GlobalRefs, DYN_DynVarType, LoadExpr;
+
+/**
+  <DYN_Definition
+      t.Struct
+    | t.Const
+    | t.GlobalVar
+    | t.Function
+    | t.GlobalRefs
+    | t.DynVarType> == t.Definition
+*/
+$ENTRY DYN_Definition {
+  (function main t.Params (var) e.Body)
+    = <DYN_Function
+        (function main t.Params (var)
+        <LoadExpr 'src/DYN/DYN_MainFCode.txt'>
+        e.Body)
+      >;
+  (function main t.Params e.Body)
+    = <DYN_Definition (function main t.Params (var) e.Body)>;
+
+  (refs e.Names) = <DYN_GlobalRefs (refs e.Names)>;
+  (dynvar e.Dynvar) = <DYN_DynVarType (dynvar e.Dynvar)>;
+
+  (function e.Function) = <DYN_Function (function e.Function)>;
+  t.Other = t.Other;
+}

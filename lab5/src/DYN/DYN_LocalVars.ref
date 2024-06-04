@@ -1,0 +1,10 @@
+*$FROM LibraryEx
+$EXTERN Map;
+
+/**
+  <DYN_LocalVars (var (refs s.Name*)? (s.Name t.ConstExpr)*)> == t.LocalVars
+*/
+$ENTRY DYN_LocalVars {
+    (var (refs e.Names) e.Defs) = (var <Map {s.Name = (s.Name 1)} e.Names>);
+    (var e.Defs) = (var e.Defs);
+}

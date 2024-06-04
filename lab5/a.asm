@@ -4,48 +4,6 @@ GETRV HALT
 :_MEMORY_SIZE 0 
 :_PROGRAM_SIZE PROGRAM_SIZE 
 
-:_out 
-GETFP GETSP SETFP 
-GETFP 2 ADD LOAD OUT 
-:__out 
-GETFP SETSP SETFP 
-1 RETN 
-
-:_getFP 
-GETFP GETSP SETFP 
-GETFP SETRV __getFP JMP 
-:__getFP 
-GETFP SETSP SETFP 
-JMP 
-
-:_printInt 
-GETFP GETSP SETFP 
-GETFP 2 ADD LOAD 
-10 
-CMP _true_if_0_printInt JGE 
-_exit_if_0_printInt JMP 
-:_true_if_0_printInt 
-GETFP 2 ADD LOAD 10 DIV _printInt CALL GETRV DROP 
-:_exit_if_0_printInt 
-GETFP 2 ADD LOAD 10 MOD 48 ADD _out CALL GETRV DROP 
-:__printInt 
-GETFP SETSP SETFP 
-1 RETN 
-
-:_newLine 
-GETFP GETSP SETFP 
-10 _out CALL GETRV DROP 
-:__newLine 
-GETFP SETSP SETFP 
-JMP 
-
-:_space 
-GETFP GETSP SETFP 
-32 _out CALL GETRV DROP 
-:__space 
-GETFP SETSP SETFP 
-JMP 
-
 :_inc__ 
 GETFP GETSP SETFP 
 GETFP 2 ADD LOAD GETFP 2 ADD LOAD LOAD 1 ADD SAVE 
@@ -61,14 +19,14 @@ GETFP SETSP SETFP
 1 RETN 
 
 :_heap_order__ 
-2 
+3 
 
 :_heap_start__ 
 0 
 
 :_getHeapBlock__ 
 GETFP GETSP SETFP 
-_PROGRAM_SIZE LOAD GETFP 2 ADD LOAD 2 SUB ADD SETRV __getHeapBlock__ JMP 
+_PROGRAM_SIZE LOAD GETFP 2 ADD LOAD 3 SUB ADD SETRV __getHeapBlock__ JMP 
 :__getHeapBlock__ 
 GETFP SETSP SETFP 
 1 RETN 
@@ -79,43 +37,6 @@ GETFP 2 ADD LOAD 1 ADD LOAD SETRV __getNextBlock__ JMP
 :__getNextBlock__ 
 GETFP SETSP SETFP 
 1 RETN 
-
-:_printHeap 
-GETFP GETSP SETFP 
-GETFP GETSP SETFP 
-1 PUSHN 
-GETFP 1 SUB 2 SAVE 
-:_loop_while_0_printHeap 
-GETFP 1 SUB LOAD 
-_heap_order__ LOAD 
-CMP _true_while_0_printHeap JLE 
-_exit_while_0_printHeap JMP 
-:_true_while_0_printHeap 
-GETFP GETSP SETFP 
-2 PUSHN 
-GETFP 2 SUB 0 SAVE 
-GETFP 1 SUB GETFP LOAD 1 SUB LOAD _getHeapBlock__ CALL GETRV LOAD SAVE 
-:_loop_while_1_printHeap 
-GETFP 1 SUB LOAD 
-0 
-CMP _true_while_1_printHeap JNE 
-_exit_while_1_printHeap JMP 
-:_true_while_1_printHeap 
-GETFP 2 SUB _inc__ CALL GETRV DROP 
-GETFP 1 SUB GETFP 1 SUB LOAD _getNextBlock__ CALL GETRV SAVE 
-_loop_while_1_printHeap JMP 
-:_exit_while_1_printHeap 
-GETFP 2 SUB LOAD _printInt CALL GETRV DROP 
-_space CALL GETRV DROP 
-GETFP SETSP SETFP 
-GETFP 1 SUB _inc__ CALL GETRV DROP 
-_loop_while_0_printHeap JMP 
-:_exit_while_0_printHeap 
-_newLine CALL GETRV DROP 
-GETFP SETSP SETFP 
-:__printHeap 
-GETFP SETSP SETFP 
-JMP 
 
 :_unlinkBlock__ 
 GETFP GETSP SETFP 
@@ -171,6 +92,7 @@ GETFP 1 SUB GETFP 2 ADD LOAD 2 ADD LOAD _getHeapBlock__ CALL GETRV SAVE
 GETFP 1 SUB LOAD LOAD GETFP 2 ADD LOAD _linkBlocks__ CALL GETRV DROP 
 GETFP 2 ADD LOAD 0 SAVE 
 GETFP 2 ADD LOAD 3 ADD 0 SAVE 
+GETFP 2 ADD LOAD 4 ADD 0 SAVE 
 GETFP 1 SUB LOAD GETFP 2 ADD LOAD SAVE 
 :__insertBlock__ 
 GETFP SETSP SETFP 
@@ -275,25 +197,97 @@ _loop_while_2_allocBlock__ JMP
 :_exit_while_2_allocBlock__ 
 GETFP 3 SUB GETFP 1 SUB LOAD _getHeapBlock__ CALL GETRV LOAD SAVE 
 GETFP 3 SUB LOAD _unlinkBlock__ CALL GETRV DROP 
-GETFP 3 SUB LOAD 4 ADD SETRV __allocBlock__ JMP 
+GETFP 3 SUB LOAD 5 ADD SETRV __allocBlock__ JMP 
 :__allocBlock__ 
 GETFP SETSP SETFP 
 1 RETN 
 
 :_deallocBlock__ 
 GETFP GETSP SETFP 
-GETFP 2 ADD GETFP 2 ADD LOAD 4 SUB SAVE 
+GETFP 2 ADD GETFP 2 ADD LOAD 5 SUB SAVE 
 GETFP 2 ADD LOAD _insertBlock__ CALL GETRV DROP 
 GETFP 2 ADD LOAD _unionBlock__ CALL GETRV DROP 
 :__deallocBlock__ 
 GETFP SETSP SETFP 
 1 RETN 
 
+:_out__ 
+GETFP GETSP SETFP 
+GETFP 2 ADD LOAD OUT 
+:__out__ 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_printInt__ 
+GETFP GETSP SETFP 
+GETFP 2 ADD LOAD 
+10 
+CMP _true_if_0_printInt__ JGE 
+_exit_if_0_printInt__ JMP 
+:_true_if_0_printInt__ 
+GETFP 2 ADD LOAD 10 DIV _printInt__ CALL GETRV DROP 
+:_exit_if_0_printInt__ 
+GETFP 2 ADD LOAD 10 MOD 48 ADD _out__ CALL GETRV DROP 
+:__printInt__ 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_newLine__ 
+GETFP GETSP SETFP 
+10 _out__ CALL GETRV DROP 
+:__newLine__ 
+GETFP SETSP SETFP 
+JMP 
+
+:_space__ 
+GETFP GETSP SETFP 
+32 _out__ CALL GETRV DROP 
+:__space__ 
+GETFP SETSP SETFP 
+JMP 
+
+:_printHeap__ 
+GETFP GETSP SETFP 
+GETFP GETSP SETFP 
+1 PUSHN 
+GETFP 1 SUB 3 SAVE 
+:_loop_while_0_printHeap__ 
+GETFP 1 SUB LOAD 
+_heap_order__ LOAD 
+CMP _true_while_0_printHeap__ JLE 
+_exit_while_0_printHeap__ JMP 
+:_true_while_0_printHeap__ 
+GETFP GETSP SETFP 
+2 PUSHN 
+GETFP 2 SUB 0 SAVE 
+GETFP 1 SUB GETFP LOAD 1 SUB LOAD _getHeapBlock__ CALL GETRV LOAD SAVE 
+:_loop_while_1_printHeap__ 
+GETFP 1 SUB LOAD 
+0 
+CMP _true_while_1_printHeap__ JNE 
+_exit_while_1_printHeap__ JMP 
+:_true_while_1_printHeap__ 
+GETFP 2 SUB _inc__ CALL GETRV DROP 
+GETFP 1 SUB GETFP 1 SUB LOAD _getNextBlock__ CALL GETRV SAVE 
+_loop_while_1_printHeap__ JMP 
+:_exit_while_1_printHeap__ 
+GETFP 2 SUB LOAD _printInt__ CALL GETRV DROP 
+_space__ CALL GETRV DROP 
+GETFP SETSP SETFP 
+GETFP 1 SUB _inc__ CALL GETRV DROP 
+_loop_while_0_printHeap__ JMP 
+:_exit_while_0_printHeap__ 
+_newLine__ CALL GETRV DROP 
+GETFP SETSP SETFP 
+:__printHeap__ 
+GETFP SETSP SETFP 
+JMP 
+
 :_main 
 GETFP GETSP SETFP 
 GETFP GETSP SETFP 
 2 PUSHN 
-GETFP 1 SUB 1 2 LSHIFT SAVE 
+GETFP 1 SUB 1 3 LSHIFT SAVE 
 GETFP 2 SUB _MEMORY_SIZE LOAD _PROGRAM_SIZE LOAD 64 ADD SUB SAVE 
 _heap_order__ LOAD _getHeapBlock__ CALL GETRV 0 SAVE 
 :_loop_while_0_main 
@@ -314,19 +308,19 @@ _heap_start__ LOAD 2 ADD _heap_order__ LOAD SAVE
 _heap_start__ LOAD _insertBlock__ CALL GETRV DROP 
 GETFP GETSP SETFP 
 3 PUSHN 
-_printHeap CALL GETRV DROP 
+_printHeap__ CALL GETRV DROP 
 GETFP 2 SUB 500 _allocBlock__ CALL GETRV SAVE 
-_printHeap CALL GETRV DROP 
+_printHeap__ CALL GETRV DROP 
 GETFP 3 SUB 25 _allocBlock__ CALL GETRV SAVE 
-_printHeap CALL GETRV DROP 
+_printHeap__ CALL GETRV DROP 
 GETFP 1 SUB 5 _allocBlock__ CALL GETRV SAVE 
-_printHeap CALL GETRV DROP 
+_printHeap__ CALL GETRV DROP 
 GETFP 2 SUB LOAD _deallocBlock__ CALL GETRV DROP 
-_printHeap CALL GETRV DROP 
+_printHeap__ CALL GETRV DROP 
 GETFP 3 SUB LOAD _deallocBlock__ CALL GETRV DROP 
-_printHeap CALL GETRV DROP 
+_printHeap__ CALL GETRV DROP 
 GETFP 1 SUB LOAD _deallocBlock__ CALL GETRV DROP 
-_printHeap CALL GETRV DROP 
+_printHeap__ CALL GETRV DROP 
 GETFP SETSP SETFP 
 0 SETRV __main JMP 
 :__main 

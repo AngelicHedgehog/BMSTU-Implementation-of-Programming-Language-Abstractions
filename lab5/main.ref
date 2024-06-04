@@ -1,13 +1,16 @@
 *$FROM LibraryEx
 *$FROM src/Program.ref
 *$FROM src/OOP/OOP_Program.ref
-$EXTERN LoadExpr, SaveFile, Program, OOP_Program;
+*$FROM src/DYN/DYN_Program.ref
+$EXTERN LoadExpr, SaveFile, Program, OOP_Program, DYN_Program;
 
 $ENTRY Go {
   /* пусто */ = <SaveFile (<Arg 2>) (
     <Program
       <OOP_Program
-        <LoadExpr <Arg 1>>
+        <DYN_Program
+          <LoadExpr <Arg 1>>
+        >
       >
     >
   )>;

@@ -1,0 +1,16 @@
+*$FROM src/DYN/DYN_Definition.ref
+*$FROM LibraryEx
+$EXTERN DYN_Definition, LoadExpr;
+
+/**
+  <DYN_Program t.Definition*> == e.Program
+*/
+$ENTRY DYN_Program {
+    e.Definitions = <_DYN_Program <LoadExpr 'src/DYN/DYN_GlobalCode.txt'> e.Definitions>;
+}
+
+_DYN_Program {
+  t.Definition e.Definitions
+    = <DYN_Definition t.Definition> <_DYN_Program e.Definitions>;
+  /* пусто */ = /* пусто */;
+}

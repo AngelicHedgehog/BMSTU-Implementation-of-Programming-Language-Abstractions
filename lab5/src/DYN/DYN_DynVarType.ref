@@ -1,0 +1,19 @@
+*$FROM LibraryEx
+$EXTERN Map;
+
+/**
+  <DYN_DynVarType
+    (dynvar s.Name
+      (refs s.Name*)?
+      (s.Name t.ConstExpr)*
+    )
+> == t.Struct
+*/
+$ENTRY DYN_DynVarType {
+    (dynvar s.Name (refs e.Names) e.Defs)
+      = (struct s.Name
+          <Map {s.Name_ = (s.Name_ 1)} e.Names>
+          e.Defs
+        );
+    (dynvar s.Name e.Defs) = (struct s.Name e.Defs);
+}

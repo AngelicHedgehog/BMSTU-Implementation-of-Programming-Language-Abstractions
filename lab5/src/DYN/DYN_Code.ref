@@ -1,0 +1,11 @@
+*$FROM src/DYN/DYN_Statement.ref
+$EXTERN DYN_Statement;
+
+/**
+  <DYN_Code t.Statement*> == e.Code
+*/
+$ENTRY DYN_Code {
+  t.Statement e.Statements
+    = <DYN_Statement t.Statement> <DYN_Code e.Statements>;
+  /* пусто */ = /* пусто */;
+}
