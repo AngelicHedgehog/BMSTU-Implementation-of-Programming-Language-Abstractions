@@ -7,8 +7,9 @@ $EXTERN DYN_LocalVars, DYN_Code;
 */
 $ENTRY DYN_Function {
   (function s.Name t.Params (var e.LocalVars) e.Code)
-    = (function s.Name t.Params <DYN_LocalVars (var e.LocalVars)> <DYN_Code e.Code>);
+    , <DYN_LocalVars (var e.LocalVars)> : t.LocalRefs e.LocalVars
+    = (function s.Name t.Params  <DYN_Code t.LocalRefs e.Code (return 0)>);
 
   (function s.Name t.Params e.Code)
-    = (function s.Name t.Params <DYN_Code e.Code>);
+    = (function s.Name t.Params <DYN_Code () e.Code (return 0)>);
 }

@@ -7,13 +7,18 @@ $EXTERN Map;
       (refs s.Name*)?
       (s.Name t.ConstExpr)*
     )
-> == t.Struct
+> == t.Struct | t.Class
 */
 $ENTRY DYN_DynVarType {
     (dynvar s.Name (refs e.Names) e.Defs)
-      = (struct s.Name
-          <Map {s.Name_ = (s.Name_ 1)} e.Names>
-          e.Defs
+      = (class s.Name (DynVarBase__)
+          (fields <Map {s.Name_ = (s.Name_ 1)} e.Names> e.Defs)
+          
+          (method delete (self)
+            <Map {
+              s.Name_ = (call refDec__ (L ((L self) "+" s.Name_)))
+            } e.Names>
+          )
         );
     (dynvar s.Name e.Defs) = (struct s.Name e.Defs);
 }

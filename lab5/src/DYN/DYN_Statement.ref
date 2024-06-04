@@ -20,24 +20,45 @@ $EXTERN DYN_Code, DYN_Expr, DYN_LocalVars, DYN_BoolExpr, Map;
     | (t.Expr ":-" t.Expr)
     | (gc-alloc t.Expr s.Name)
     | (ref-return t.Expr)
-  > == t.Statement
+  > == t.Statement*
 */
 $ENTRY DYN_Statement {
-  (t.ObjectPtr "=" t.Expr) = (<DYN_Expr t.ObjectPtr> "=" <DYN_Expr t.Expr>);
-  (call t.Expr e.Args) = (call <Map DYN_Expr t.Expr e.Args>);
-  (mcall t.Object s.Method e.Args) = (mcall <DYN_Expr t.Object> s.Method <Map DYN_Expr e.Args>);
-  (return t.Expr) = (return <DYN_Expr t.Expr>);
-  (if t.BoolExpr e.CodeT else e.CodeF)
-    = (if <DYN_BoolExpr t.BoolExpr> <DYN_Code e.CodeT> else <DYN_Code e.CodeF>);
-  (if t.BoolExpr e.Code) = (if <DYN_BoolExpr t.BoolExpr> <DYN_Code e.Code>);
-  (while t.BoolExpr e.Code) = (while <DYN_BoolExpr t.BoolExpr> <DYN_Code e.Code>);
-  (block t.LocalVars e.Code) = (block <DYN_LocalVars t.LocalVars> <DYN_Code e.Code>);
-  (init t.ObjectPtr s.Name) = (init <DYN_Expr t.ObjectPtr> s.Name);
+  t.LocalRefs (t.ObjectPtr "=" t.Expr) = (<DYN_Expr t.ObjectPtr> "=" <DYN_Expr t.Expr>);
+  t.LocalRefs (call t.Expr e.Args) = (call <Map DYN_Expr t.Expr e.Args>);
+  t.LocalRefs (mcall t.Object s.Method e.Args) = (mcall <DYN_Expr t.Object> s.Method <Map DYN_Expr e.Args>);
+  t.LocalRefs (if t.BoolExpr e.CodeT else e.CodeF)
+    = (if <DYN_BoolExpr t.BoolExpr> <DYN_Code t.LocalRefs e.CodeT> else <DYN_Code t.LocalRefs e.CodeF>);
+  t.LocalRefs (if t.BoolExpr e.Code) = (if <DYN_BoolExpr t.BoolExpr> <DYN_Code t.LocalRefs e.Code>);
+  t.LocalRefs (while t.BoolExpr e.Code) = (while <DYN_BoolExpr t.BoolExpr> <DYN_Code t.LocalRefs e.Code>);
+  t.LocalRefs (block t.LocalVars e.Code) = (block <DYN_LocalVars t.LocalVars> <DYN_Code t.LocalRefs e.Code>);
+  t.LocalRefs (init t.ObjectPtr s.Name) = (init <DYN_Expr t.ObjectPtr> s.Name);
+
+  (e.LocalRefs) (return t.Expr)
+    = (return
+        (let ((let_ret__ 1))
+          (let_ret__ "=" <DYN_Expr t.Expr>)
+          <Map {
+            s.LocalRef = (call refDec__ (L s.LocalRef));
+          } e.LocalRefs>
+          (L let_ret__)
+        )
+      );
+
+  t.LocalRefs (t.Expr ":-" t.Expr) = ((L <DYN_Expr t.Expr>) "=" <DYN_Expr t.Expr>);
+
+  t.LocalRefs (gc-alloc t.Expr s.Name) = (<DYN_Expr t.Expr> "=" (call allocBlock__ s.Name));
+
+  (e.LocalRefs) (ref-return t.Expr)
+    = (return
+      (let ((let_ret__ 1))
+        (let_ret__ "=" <DYN_Expr t.Expr>)
+        (call refInc__ (L let_ret__))
+        <Map {
+          s.LocalRef = (call refDec__ (L s.LocalRef));
+        } e.LocalRefs>
+        (L let_ret__)
+      )
+    );
   
-  /* TODO: подсчет ссылок нужен бы тут */
-  (t.Expr ":-" t.Expr) = ((L <DYN_Expr t.Expr>) "=" <DYN_Expr t.Expr>);
-  (gc-alloc t.Expr s.Name) = (<DYN_Expr t.Expr> "=" (call allocBlock__ s.Name));
-  (ref-return t.Expr) = (return (L <DYN_Expr t.Expr>));
-  
-  e.Other = e.Other
+  t.LocalRefs e.Other = e.Other
 }

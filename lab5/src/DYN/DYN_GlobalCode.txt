@@ -122,6 +122,7 @@
     (block "=" (L (call getHeapBlock__ (L r))))
 
     (call unlinkBlock__ (L block))
+    (((L block) "+" 4) "=" 1)
     (return ((L block) "+" 5))
 )
 
@@ -167,5 +168,25 @@
             (call inc__ i)
         )
         (call newLine__)
+    )
+)
+
+(class DynVarBase__ ()
+    (method delete (self)
+    )
+)
+
+(function refInc__ (ref)
+    (if ((L ref) "<>" 0)
+        (call inc__ ((L ref) "-" 1))
+    )
+)
+
+(function refDec__ (ref)
+    (if ((L ref) "<>" 0)
+        (call dec__ ((L ref) "-" 1))
+        (if ((L ((L ref) "-" 1)) "<=" 0)
+            (call deallocBlock__ (L ref))
+        )
     )
 )

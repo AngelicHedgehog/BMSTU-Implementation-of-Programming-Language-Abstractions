@@ -20,8 +20,8 @@ $ENTRY DYN_Class {
             (fields e.Fields)
             <Map {
                 (method s.Name_ t.Params (var e.LocalVars) e.Code)
-                    = (method s.Name_ t.Params <DYN_LocalVars (var e.LocalVars)> <DYN_Code e.Code>);
-                (method s.Name_ t.Params e.Code) = (method s.Name_ t.Params <DYN_Code e.Code>);
+                    = (method s.Name_ t.Params <DYN_LocalVars (var e.LocalVars)> <DYN_Code () e.Code>);
+                (method s.Name_ t.Params e.Code) = (method s.Name_ t.Params <DYN_Code () e.Code>);
             } e.Methods>
           );
     (class s.Name t.Base e.Methods) = <DYN_Class (class s.Name t.Base (fields) e.Methods)>;

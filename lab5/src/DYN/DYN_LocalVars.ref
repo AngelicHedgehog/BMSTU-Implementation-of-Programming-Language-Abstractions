@@ -2,12 +2,12 @@
 $EXTERN Map;
 
 /**
-  <DYN_LocalVars (var (refs s.Name*)? (s.Name t.ConstExpr)*)> == t.LocalVars
+  <DYN_LocalVars (var (refs s.Name*)? (s.Name t.ConstExpr)*)> == t.LocalRefs t.LocalVars
 */
 $ENTRY DYN_LocalVars {
-    (var (refs e.Names) e.Defs) = (var <Map {s.Name = (s.Name 1)} e.Names>);
-    (var e.Defs) = (var e.Defs);
+    (var (refs e.Names) e.Defs) = (e.Names) (var <Map {s.Name = (s.Name 1)} e.Names>);
+    (var e.Defs) = () (var e.Defs);
 
-    ((refs e.Names) e.Defs) = (<Map {s.Name = (s.Name 1)} e.Names>);
+*    ((refs e.Names) e.Defs) = (<Map {s.Name = (s.Name 1)} e.Names>);
     (e.Defs) = (e.Defs);
 }

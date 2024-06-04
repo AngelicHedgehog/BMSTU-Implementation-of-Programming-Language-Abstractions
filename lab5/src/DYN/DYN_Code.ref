@@ -2,10 +2,10 @@
 $EXTERN DYN_Statement;
 
 /**
-  <DYN_Code t.Statement*> == e.Code
+  <DYN_Code t.LocalRefs t.Statement*> == e.Code
 */
 $ENTRY DYN_Code {
-  t.Statement e.Statements
-    = <DYN_Statement t.Statement> <DYN_Code e.Statements>;
-  /* пусто */ = /* пусто */;
+  t.LocalRefs t.Statement e.Statements
+    = <DYN_Statement t.LocalRefs t.Statement> <DYN_Code t.LocalRefs e.Statements>;
+  t.LocalRefs = /* пусто */;
 }
