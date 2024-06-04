@@ -1,0 +1,21 @@
+*$FROM src/DYN/DYN_Expr.ref
+$EXTERN DYN_Expr;
+
+/**
+  <DYN_BoolExpr
+      TRUE | FALSE
+    | (t.Expr s.RelOp t.Expr)
+    | (not t.BoolExpr)
+    | (t.BoolExpr and t.BoolExpr)
+    | (t.BoolExpr or t.BoolExpr)
+    | (isinstance e.ObjectPtr s.Name)
+  > == t.BoolExpr
+*/
+$ENTRY DYN_BoolExpr {
+  (not t.BoolExpr) = (not <DYN_BoolExpr t.BoolExpr>);
+  (t.BoolExprL and t.BoolExprR) = (<DYN_BoolExpr t.BoolExprL> and <DYN_BoolExpr t.BoolExprR>);
+  (t.BoolExprL or t.BoolExprR) = (<DYN_BoolExpr t.BoolExprL> or <DYN_BoolExpr t.BoolExprR>);
+  (isinstance t.ObjectPtr s.Name) = (isinstance <DYN_Expr t.ObjectPtr> s.Name);
+  (t.ExprL s.RelOp t.ExprR) = (<DYN_Expr t.ExprL> s.RelOp <DYN_Expr t.ExprR>);
+  e.Other = e.Other;
+}

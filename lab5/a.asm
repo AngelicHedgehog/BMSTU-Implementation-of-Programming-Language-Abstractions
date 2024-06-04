@@ -283,6 +283,30 @@ GETFP SETSP SETFP
 GETFP SETSP SETFP 
 JMP 
 
+:_Animal__setName 
+GETFP GETSP SETFP 
+GETFP 2 ADD LOAD 1 ADD GETFP 3 ADD LOAD SAVE 
+:__Animal__setName 
+GETFP SETSP SETFP 
+2 RETN 
+
+:_Animal__getName 
+GETFP GETSP SETFP 
+GETFP 2 ADD LOAD 1 ADD LOAD SETRV __Animal__getName JMP 
+:__Animal__getName 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_Animal__getType 
+GETFP GETSP SETFP 
+1 SETRV __Animal__getType JMP 
+:__Animal__getType 
+GETFP SETSP SETFP 
+1 RETN 
+
+:_Animal_vtbl__ 
+0 _Animal__setName _Animal__getName _Animal__getType 
+
 :_main 
 GETFP GETSP SETFP 
 GETFP GETSP SETFP 

@@ -1,0 +1,28 @@
+*$FROM src/DYN/DYN_LocalVars.ref
+*$FROM src/DYN/DYN_Code.ref
+*$FROM LibraryEx
+$EXTERN DYN_LocalVars, DYN_Code, Map;
+
+/**
+  <DYN_Class 
+    t.Classes
+    (class s.Name (s.Name?)
+      (fields (s.Name t.ConstExpr)*)?
+      (method s.Name (s.Name+) t.LocalVars? e.Code)*
+  )> == t.Classes t.Function
+
+  t.Classes ::= ((s.ClassName t.MethodList)*)
+  t.MethodList ::= ((s.MethodOwner s.MethodName)*)
+*/
+$ENTRY DYN_Class {
+    (class s.Name t.Base (fields e.Fields) e.Methods)
+        = (class s.Name t.Base
+            (fields e.Fields)
+            <Map {
+                (method s.Name_ t.Params (var e.LocalVars) e.Code)
+                    = (method s.Name_ t.Params <DYN_LocalVars (var e.LocalVars)> <DYN_Code e.Code>);
+                (method s.Name_ t.Params e.Code) = (method s.Name_ t.Params <DYN_Code e.Code>);
+            } e.Methods>
+          );
+    (class s.Name t.Base e.Methods) = <DYN_Class (class s.Name t.Base (fields) e.Methods)>;
+}

@@ -7,4 +7,7 @@ $EXTERN Map;
 $ENTRY DYN_LocalVars {
     (var (refs e.Names) e.Defs) = (var <Map {s.Name = (s.Name 1)} e.Names>);
     (var e.Defs) = (var e.Defs);
+
+    ((refs e.Names) e.Defs) = (<Map {s.Name = (s.Name 1)} e.Names>);
+    (e.Defs) = (e.Defs);
 }

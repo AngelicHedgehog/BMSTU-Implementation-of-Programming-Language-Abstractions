@@ -1,6 +1,9 @@
 *$FROM src/DYN/DYN_Code.ref
+*$FROM src/DYN/DYN_Expr.ref
+*$FROM src/DYN/DYN_LocalVars.ref
+*$FROM src/DYN/DYN_BoolExpr.ref
 *$FROM LibraryEx
-$EXTERN DYN_Code, Map;
+$EXTERN DYN_Code, DYN_Expr, DYN_LocalVars, DYN_BoolExpr, Map;
 
 /**
   <DYN_Statement
@@ -20,21 +23,21 @@ $EXTERN DYN_Code, Map;
   > == t.Statement
 */
 $ENTRY DYN_Statement {
-  (t.ObjectPtr "=" t.Expr) = (t.ObjectPtr "=" t.Expr);
-  (call t.Expr e.Args) = (call t.Expr e.Args);
-  (mcall t.Object s.Method e.Args) = (mcall t.Object s.Method e.Args);
-  (return t.Expr) = (return t.Expr);
+  (t.ObjectPtr "=" t.Expr) = (<DYN_Expr t.ObjectPtr> "=" <DYN_Expr t.Expr>);
+  (call t.Expr e.Args) = (call <Map DYN_Expr t.Expr e.Args>);
+  (mcall t.Object s.Method e.Args) = (mcall <DYN_Expr t.Object> s.Method <Map DYN_Expr e.Args>);
+  (return t.Expr) = (return <DYN_Expr t.Expr>);
   (if t.BoolExpr e.CodeT else e.CodeF)
-    = (if t.BoolExpr <DYN_Code e.CodeT> else <DYN_Code e.CodeF>);
-  (if t.BoolExpr e.Code) = (if t.BoolExpr <DYN_Code e.Code>);
-  (while t.BoolExpr e.Code) = (while t.BoolExpr <DYN_Code e.Code>);
-  (block t.LocalVars e.Code) = (block t.LocalVars <DYN_Code e.Code>);
-  (init t.ObjectPtr s.Name) = (init t.ObjectPtr s.Name);
+    = (if <DYN_BoolExpr t.BoolExpr> <DYN_Code e.CodeT> else <DYN_Code e.CodeF>);
+  (if t.BoolExpr e.Code) = (if <DYN_BoolExpr t.BoolExpr> <DYN_Code e.Code>);
+  (while t.BoolExpr e.Code) = (while <DYN_BoolExpr t.BoolExpr> <DYN_Code e.Code>);
+  (block t.LocalVars e.Code) = (block <DYN_LocalVars t.LocalVars> <DYN_Code e.Code>);
+  (init t.ObjectPtr s.Name) = (init <DYN_Expr t.ObjectPtr> s.Name);
   
-  /* TODO =D */
-  (t.Expr ":-" t.Expr) = ((L t.Expr) "=" t.Expr);
-  (gc-alloc t.Expr s.Name) = (t.Expr "=" (call allocBlock__ s.Name));
-  (ref-return t.Expr) = (return (L t.Expr));
+  /* TODO: подсчет ссылок нужен бы тут */
+  (t.Expr ":-" t.Expr) = ((L <DYN_Expr t.Expr>) "=" <DYN_Expr t.Expr>);
+  (gc-alloc t.Expr s.Name) = (<DYN_Expr t.Expr> "=" (call allocBlock__ s.Name));
+  (ref-return t.Expr) = (return (L <DYN_Expr t.Expr>));
   
   e.Other = e.Other
 }

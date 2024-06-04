@@ -1,8 +1,9 @@
 *$FROM src/DYN/DYN_Function.ref
 *$FROM src/DYN/DYN_GlobalRefs.ref
 *$FROM src/DYN/DYN_DynVarType.ref
+*$FROM src/DYN/DYN_Class.ref
 *$FROM LibraryEx
-$EXTERN DYN_Function, DYN_GlobalRefs, DYN_DynVarType, LoadExpr;
+$EXTERN DYN_Function, DYN_GlobalRefs, DYN_DynVarType, DYN_Class, LoadExpr;
 
 /**
   <DYN_Definition
@@ -11,7 +12,8 @@ $EXTERN DYN_Function, DYN_GlobalRefs, DYN_DynVarType, LoadExpr;
     | t.GlobalVar
     | t.Function
     | t.GlobalRefs
-    | t.DynVarType> == t.Definition
+    | t.DynVarType
+    | t.Class> == t.Definition
 */
 $ENTRY DYN_Definition {
   (function main t.Params (var) e.Body)
@@ -27,5 +29,6 @@ $ENTRY DYN_Definition {
   (dynvar e.Dynvar) = <DYN_DynVarType (dynvar e.Dynvar)>;
 
   (function e.Function) = <DYN_Function (function e.Function)>;
+  (class e.Class) = <DYN_Class (class e.Class)>;
   t.Other = t.Other;
 }

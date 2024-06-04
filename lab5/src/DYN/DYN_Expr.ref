@@ -1,0 +1,29 @@
+*$FROM src/DYN/DYN_Code.ref
+*$FROM src/DYN/DYN_LocalVars.ref
+*$FROM LibraryEx
+$EXTERN DYN_Code, DYN_LocalVars, Map;
+
+/**
+  <DYN_Expr
+      s.Name
+    | s.NUMBER
+    | (L t.Expr)
+    | ("-" t.Expr)
+    | (t.Expr s.BinOp t.Expr)
+    | (call t.Expr t.Expr*)
+    | (mcall t.Expr s.Name t.Expr*)
+    | (asm s.ANY+)
+    | (t.Expr "=" t.Expr)
+    | (let t.LocalVars e.Code t.Expr)
+  > == t.Expr
+*/
+$ENTRY DYN_Expr {
+  (L t.Expr) = (L <DYN_Expr t.Expr>);
+  ("-" t.Expr) = ("-" <DYN_Expr t.Expr>);
+  (call t.Expr e.Exprs) = (call <Map DYN_Expr t.Expr e.Exprs>);
+  (mcall t.Object s.Method e.Args) = (mcall <DYN_Expr t.Object> s.Method <Map DYN_Expr e.Args>);
+  (t.ExprL "=" t.ExprR) = (<DYN_Expr t.ExprL> "=" <DYN_Expr t.ExprR>);
+  (let t.LocalVars e.Code t.Expr) = (let <DYN_LocalVars t.LocalVars> <DYN_Code e.Code> <DYN_Expr t.Expr>);
+  (t.ExprL s.BinOp t.ExprR) = (<DYN_Expr t.ExprL> s.BinOp <DYN_Expr t.ExprR>);
+  e.Other = e.Other;
+}
