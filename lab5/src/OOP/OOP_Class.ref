@@ -1,0 +1,119 @@
+*$FROM src/OOP/OOP_Code.ref
+*$FROM LibraryEx
+$EXTERN OOP_Code, Map, Inc;
+
+/**
+  <OOP_Class 
+    t.Classes
+    (class s.Name (s.Name?)
+      (fields (s.Name t.ConstExpr)*)?
+      (method s.Name (s.Name+) t.LocalVars? e.Code)*
+  )> == t.Classes t.Function
+
+  t.Classes ::= ((s.ClassName t.MethodList)*)
+  t.MethodList ::= ((s.MethodOwner s.MethodName)*)
+*/
+$ENTRY OOP_Class {
+  (e.Classes) (class s.Name () (fields e.Fields) e.Methods)
+    = (e.Classes
+        (s.Name
+          (<Map
+            { (method s.MethodName e._) = (s.Name s.MethodName); }
+            e.Methods
+          >)
+        )
+      )
+      (struct s.Name
+        ("-" 1)
+        e.Fields
+      )
+      (struct <Implode_Ext <Explode s.Name> '_class__'>
+        <Map
+          { (method s.MethodName e._) = (s.MethodName 1); }
+          e.Methods
+        >
+      )
+      <Map {
+        (method s.MethodName t.Params e.Body)
+          = (function <Implode_Ext <Explode s.Name> '__' <Explode s.MethodName>>
+            t.Params
+            <OOP_Code e.Body>
+          )
+      } e.Methods>
+      (var <Implode_Ext <Explode s.Name> '_vtbl__'>
+        (<Implode_Ext <Explode s.Name> '_class__'> "+" 1) "="
+        0
+        <Map
+          {
+            (method s.MethodName e._)
+              = <Implode_Ext <Explode s.Name> '__' <Explode s.MethodName>>;
+          }
+          e.Methods
+        >
+      );
+  
+  (e.Classes) (class s.Name (s.Base) (fields e.Fields) e.Methods)
+    , e.Classes : e._ (s.Base (e.BaseMethods)) e._
+    , <Map {
+      (method s.NewMethod t.Params e.Body)
+        , e.BaseMethods : e._ (s._ s.NewMethod) e._
+        = /* пусто */;
+      e.Method = e.Method;
+    } e.Methods> : e.NewMethods
+    = (e.Classes (s.Name
+        (
+          <Map {
+            (s.BaseName s.BaseMethod)
+              , e.Methods : e._ (method s.BaseMethod e._) e._
+              = (s.Name s.BaseMethod);
+            (s.BaseName s.BaseMethod) = (s.BaseName s.BaseMethod);
+          } e.BaseMethods>
+          <Map {
+            (method s.NewMethod e._) = (s.Name s.NewMethod);
+          } e.NewMethods>
+        )
+      ))
+      (struct s.Name
+        ("-" s.Base)
+        e.Fields
+      )
+      (struct <Implode_Ext <Explode s.Name> '_class__'>
+        ("-" <Implode_Ext <Explode s.Base> '_class__'>)
+        <Map
+          {
+            (method s.MethodName e._) = (s.MethodName 1);
+          }
+          e.NewMethods
+        >
+      )
+      <Map {
+        (method s.MethodName t.Params e.Body)
+          = (function <Implode_Ext <Explode s.Name> '__' <Explode s.MethodName>>
+            t.Params
+            <OOP_Code e.Body>
+          )
+      } e.Methods>
+      (var <Implode_Ext <Explode s.Name> '_vtbl__'>
+        (<Implode_Ext <Explode s.Name> '_class__'> "+" 1) "="
+        <Implode_Ext <Explode s.Base> '_vtbl__'>
+        <Map {
+          /* переопределённый метод */
+          (s.BaseName s.BaseMethod)
+            , e.Methods : e._ (method s.BaseMethod e._) e._
+            = <Implode_Ext <Explode s.Name> '__' <Explode s.BaseMethod>>;
+          /* унаследованный метод */
+          (s.BaseName s.BaseMethod)
+            = <Implode_Ext <Explode s.BaseName> '__' <Explode s.BaseMethod>>;
+        } e.BaseMethods>
+        /* новый метод */
+        <Map
+          {
+            (method s.MethodName e._)
+              = <Implode_Ext <Explode s.Name> '__' <Explode s.MethodName>>;
+          }
+          e.NewMethods
+        >
+      );
+
+  t.Classes (class s.Name t.Base e.Methods) = <OOP_Class t.Classes (class s.Name t.Base (fields) e.Methods)>;
+}

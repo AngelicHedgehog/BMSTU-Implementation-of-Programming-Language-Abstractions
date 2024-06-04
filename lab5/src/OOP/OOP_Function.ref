@@ -1,0 +1,13 @@
+*$FROM src/OOP/OOP_Code.ref
+$EXTERN OOP_Code;
+
+/**
+  <OOP_Function (function s.Name (s.Name*) t.LocalVars? e.Code)> == t.Function
+*/
+$ENTRY OOP_Function {
+  (function s.Name t.Params (var e.LocalVars) e.Code)
+    = (function s.Name t.Params (var e.LocalVars) <OOP_Code e.Code>);
+
+  (function s.Name t.Params e.Code)
+    = (function s.Name t.Params <OOP_Code e.Code>);
+}

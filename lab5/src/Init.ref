@@ -1,0 +1,13 @@
+*$FROM src/ConstExpr.ref
+$EXTERN ConstExpr;
+
+/**
+  <Init t.Globals s.Size "=" t.ConstExpr*> == s.AsmCodeCmd*
+*/
+$ENTRY Init {
+  t.Globals 0 "=" = /* пусто */;
+  t.Globals s.Size "=" = 0 <Init t.Globals <Sub s.Size 1> "=">;
+  t.Globals s.Size "=" t.ConstExpr e.ConstExprs
+    , <ConstExpr t.Globals t.ConstExpr> : s.ConstVal
+    = s.ConstVal <Init t.Globals <Sub s.Size 1> "=" e.ConstExprs>;
+}

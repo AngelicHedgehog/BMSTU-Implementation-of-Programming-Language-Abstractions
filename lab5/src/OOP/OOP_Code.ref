@@ -1,0 +1,11 @@
+*$FROM src/OOP/OOP_Statement.ref
+$EXTERN OOP_Statement;
+
+/**
+  <OOP_Code t.Statement*> == e.Code
+*/
+$ENTRY OOP_Code {
+  t.Statement e.Statements
+    = <OOP_Statement t.Statement> <OOP_Code e.Statements>;
+  /* пусто */ = /* пусто */;
+}

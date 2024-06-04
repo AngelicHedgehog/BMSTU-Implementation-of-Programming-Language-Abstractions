@@ -1,0 +1,35 @@
+*$FROM src/OOP/OOP_Expr.ref
+*$FROM src/OOP/OOP_BoolExpr.ref
+*$FROM src/OOP/OOP_Code.ref
+*$FROM LibraryEx
+$EXTERN OOP_Expr, OOP_BoolExpr, OOP_Code, Map;
+
+/**
+  <OOP_Statement
+      (t.Expr "=" t.Expr)
+    | (call t.Expr t.Expr*)
+    | (mcall t.Expr s.Name t.Expr*)
+    | (return t.Expr)
+    | (if t.BoolExpr e.Code)
+    | (if t.BoolExpr e.Code else e.Code)
+    | (while t.BoolExpr e.Code)
+    | (asm s.ANY+)
+    | (block t.LocalVars e.Code)
+    | (init t.ObjectPtr s.Name)
+  > == t.Statement
+*/
+$ENTRY OOP_Statement {
+  (t.ObjectPtr "=" t.Expr) = (<OOP_Expr t.ObjectPtr> "=" <OOP_Expr t.Expr>);
+  (call t.Expr e.Args) = (call <Map OOP_Expr t.Expr e.Args>);
+  (return t.Expr) = (return <OOP_Expr t.Expr>);
+  (if t.BoolExpr e.CodeT else e.CodeF)
+    = (if <OOP_BoolExpr t.BoolExpr> <OOP_Code e.CodeT> else <OOP_Code e.CodeF>);
+  (if t.BoolExpr e.Code) = (if <OOP_BoolExpr t.BoolExpr> <OOP_Code e.Code>);
+  (while t.BoolExpr e.Code) = (while <OOP_BoolExpr t.BoolExpr> <OOP_Code e.Code>);
+  (block t.LocalVars e.Code) = (block t.LocalVars <OOP_Code e.Code>);
+
+  (init t.ObjectPtr s.Name) = (<OOP_Expr t.ObjectPtr> "=" <Implode_Ext <Explode s.Name> '_vtbl__'>);
+  (mcall t.Object s.Method e.Args) = <OOP_Expr (mcall t.Object s.Method e.Args)>;
+  
+  e.Other = e.Other
+}

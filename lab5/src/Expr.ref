@@ -1,0 +1,102 @@
+*$FROM src/Name.ref
+*$FROM src/BinOp.ref
+*$FROM src/LocalVars.ref
+*$FROM src/Code.ref
+*$FROM LibraryEx
+$EXTERN Name, BinOp, LocalVars, Code, Map;
+
+/**
+  <Expr
+    t.Globals
+    t.Locals
+      s.Name
+    | s.NUMBER
+    | (L t.Expr)
+    | ("-" t.Expr)
+    | (t.Expr s.BinOp t.Expr)
+    | (call t.Expr t.Expr*)
+    | (asm s.ANY+)
+    | (t.Expr "=" t.Expr)
+    | (let t.LocalVars e.Code t.Expr)
+  > == t.Locals s.AsmCodeCmd*
+*/
+$ENTRY Expr {
+  t.Globals t.Locals (t.ExprL "=" t.ExprR)
+    , <Expr t.Globals t.Locals t.ExprL> : t.Locals1 e.L
+    , <Expr t.Globals t.Locals1 t.ExprR> : t.Locals2 e.R
+    = t.Locals2
+      e.L e.R SWAP OVER SAVE;
+  
+  t.Globals (e.Locals) (let (e.LocalVars) e.Code t.Expr)
+    , <LocalVars t.Globals e.LocalVars> : {
+      e.LocalVars1_ '|' s.AllocateSize_ PUSHN '\n' = e.LocalVars1_ s.AllocateSize_;
+      '|' = 0;
+    } : e.LocalVars1 s.AllocateSize
+    , <Map {
+      (s.Name e.Val (e.FPWay)) = (s.Name e.Val (e.FPWay LOAD));
+      e.Other = e.Other;
+    } e.Locals> e.LocalVars1 : e.Locals1
+    , <Code t.Globals (e.Locals1) e.Code> : (e.Locals2) e.AsmCode
+    , <Expr t.Globals (e.Locals2) t.Expr> : (e.Locals3) e.ExprCode
+    , <Map {
+      (s.Name e.Val (e.FPWay LOAD)) = (s.Name e.Val (e.FPWay));
+      (s.Name e.Val (GETFP)) = /* пусто */;
+      e.Other = e.Other;
+    } e.Locals3> : e.Locals4
+    = (e.Locals4)
+      GETFP GETSP SETFP '\n'
+      s.AllocateSize PUSHN '\n'
+      e.AsmCode
+      e.ExprCode
+      SETRV
+      GETFP SETSP SETFP '\n'
+      GETRV;
+
+  t.Globals t.Locals s.Number
+    , <Type s.Number> : 'N' e._
+    = t.Locals s.Number;
+
+  t.Globals t.Locals s.Name
+    , <Name t.Globals s.Name> : SUCC e.Val
+    = t.Locals e.Val;
+
+  t.Globals t.Locals s.Name
+    , <Name t.Locals s.Name> : ERR
+    = t.Locals '_' s.Name;
+
+  t.Globals t.Locals s.Name
+    , <Name t.Locals s.Name> : {
+      SUCC '-' s.Val (e.FPWay) = s.Val e.FPWay SUB;
+      SUCC s.Val (e.FPWay) = s.Val e.FPWay ADD;
+    } : s.Val e.FPWay s.Op
+    = t.Locals e.FPWay s.Val s.Op;
+
+  t.Globals t.Locals (L t.Expr) = <Expr t.Globals t.Locals t.Expr> LOAD;
+
+  t.Globals t.Locals ("-" t.Expr) = <Expr t.Globals t.Locals t.Expr> NEG;
+
+  t.Globals t.Locals (call t.Expr e.Exprs)
+    , <CompileArgs t.Globals t.Locals e.Exprs> : t.Locals1 e.Args
+    , <Expr t.Globals t.Locals1 t.Expr> : t.Locals2 e.Func
+    = t.Locals2
+      e.Args e.Func
+      CALL GETRV;
+
+  t.Globals t.Locals (asm e.Code) = t.Locals e.Code;
+
+  t.Globals t.Locals (t.ExprL s.BinOp t.ExprR)
+    , <Expr t.Globals t.Locals t.ExprL> : t.Locals1 e.L
+    , <Expr t.Globals t.Locals1 t.ExprR> : t.Locals2 e.R
+    = t.Locals2
+      e.L e.R
+      <BinOp s.BinOp>;
+}
+
+CompileArgs {
+  t.Globals t.Locals e.Args t.Arg
+    , <Expr t.Globals t.Locals t.Arg> : t.Locals1 e.CmpArg
+    , <CompileArgs t.Globals t.Locals1 e.Args> : t.Locals2 e.CmpArgs
+    = t.Locals2
+      e.CmpArg e.CmpArgs;
+  t.Globals t.Locals = t.Locals;
+}

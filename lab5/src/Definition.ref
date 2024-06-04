@@ -1,0 +1,19 @@
+*$FROM src/Struct.ref
+*$FROM src/Const.ref
+*$FROM src/GlobalVar.ref
+*$FROM src/Function.ref
+$EXTERN Struct, Const, GlobalVar, Function;
+
+/**
+  <Definition t.Globals
+      t.Struct
+    | t.Const
+    | t.GlobalVar
+    | t.Function> == t.Globals s.AsmCodeCmd*
+*/
+$ENTRY Definition {
+  t.Globals (struct e.Struct) = <Struct t.Globals (struct e.Struct)>;
+  t.Globals (const e.Const) = <Const t.Globals (const e.Const)>;
+  t.Globals (var e.GlobalVar) = <GlobalVar t.Globals (var e.GlobalVar)>;
+  t.Globals (function e.Function) = <Function t.Globals (function e.Function)>;
+}

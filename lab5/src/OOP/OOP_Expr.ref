@@ -1,0 +1,39 @@
+*$FROM src/OOP/OOP_Code.ref
+*$FROM LibraryEx
+$EXTERN OOP_Code, Map;
+
+/**
+  <OOP_Expr
+      s.Name
+    | s.NUMBER
+    | (L t.Expr)
+    | ("-" t.Expr)
+    | (t.Expr s.BinOp t.Expr)
+    | (call t.Expr t.Expr*)
+    | (mcall t.Expr s.Name t.Expr*)
+    | (asm s.ANY+)
+    | (t.Expr "=" t.Expr)
+    | (let t.LocalVars e.Code t.Expr)
+  > == t.Expr
+*/
+$ENTRY OOP_Expr {
+  (L t.Expr) = (L <OOP_Expr t.Expr>);
+  ("-" t.Expr) = ("-" <OOP_Expr t.Expr>);
+  (call t.Expr e.Exprs) = (call <Map OOP_Expr t.Expr e.Exprs>);
+  (t.ExprL "=" t.ExprR) = (<OOP_Expr t.ExprL> "=" <OOP_Expr t.ExprR>);
+  (let t.LocalVars e.Code t.Expr) = (let t.LocalVars <OOP_Code e.Code> <OOP_Expr t.Expr>);
+
+  (mcall t.Object s.Method e.Args)
+    = (let ((object_let__ 1))
+        (object_let__ "=" <OOP_Expr t.Object>)
+        (call
+          (L (
+            ((L (L object_let__)) "+" 1) "+" s.Method
+          ))
+          (L object_let__) e.Args
+        )
+      );
+
+  (t.ExprL s.BinOp t.ExprR) = (<OOP_Expr t.ExprL> s.BinOp <OOP_Expr t.ExprR>);
+  e.Other = e.Other;
+}

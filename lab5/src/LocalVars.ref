@@ -1,0 +1,19 @@
+*$FROM src/Name.ref
+*$FROM src/ConstExpr.ref
+$EXTERN Name, ConstExpr;
+
+/**
+  <LocalVars (var (s.Name t.ConstExpr)*)> == t.Locals e.AllocateCode
+*/
+$ENTRY LocalVars {
+  t.Globals = '|';
+  t.Globals e.LocalVars = <_LocalVars t.Globals 0 e.LocalVars> PUSHN '\n';
+}
+
+_LocalVars {
+  t.Globals s.MemShift = '|' s.MemShift;
+  t.Globals s.MemShift (s.VarName s.VarSize) e.LocalVars
+    , <Add s.MemShift <ConstExpr t.Globals s.VarSize>> : s.VarShift
+    = (s.VarName <Sub 0 s.VarShift> (GETFP))
+      <_LocalVars t.Globals s.VarShift e.LocalVars>;
+}

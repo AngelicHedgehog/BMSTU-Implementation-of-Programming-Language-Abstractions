@@ -1,0 +1,21 @@
+*$FROM src/Name.ref
+*$FROM src/ConstExpr.ref
+$EXTERN Name, ConstExpr;
+
+/**
+  <Struct t.Globals (struct s.Name (s.Name t.ConstExpr)*)> == t.Globals
+*/
+$ENTRY Struct {
+  (e.Globals) (struct s.Name e.Fields) = (e.Globals <_Struct (e.Globals) 0 s.Name e.Fields>);
+}
+
+_Struct {
+  t.Globals s.Size s.Name = (s.Name s.Size);
+  t.Globals s.Size s.Name ("-" t.ConstExpr) e.Fields
+    , <ConstExpr t.Globals t.ConstExpr> : s.FieldSize
+    = <_Struct t.Globals <Add s.Size s.FieldSize> s.Name e.Fields>;
+  t.Globals s.Size s.Name (s.FieldName t.ConstExpr) e.Fields
+    , <ConstExpr t.Globals t.ConstExpr> : s.FieldSize
+    = (s.FieldName s.Size)
+      <_Struct t.Globals <Add s.Size s.FieldSize> s.Name e.Fields>;
+}

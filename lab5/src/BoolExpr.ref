@@ -1,0 +1,66 @@
+*$FROM src/Expr.ref
+*$FROM src/RelOp.ref
+*$FROM src/Name.ref
+$EXTERN Expr, RelOp, Name;
+
+/**
+  <BoolExpr
+    t.Globals t.Locals t.TLabel t.FLabel
+      TRUE | FALSE
+    | (t.Expr s.RelOp t.Expr)
+    | (not t.BoolExpr)
+    | (t.BoolExpr and t.BoolExpr)
+    | (t.BoolExpr or t.BoolExpr)
+  > == t.Locals s.AsmCodeCmd*
+*/
+$ENTRY BoolExpr {
+  t.Globals t.Locals (e.TLabel) (e.FLabel) TRUE
+    = t.Locals
+      e.TLabel JMP;
+
+  t.Globals t.Locals (e.TLabel) (e.FLabel) FALSE
+    = t.Locals
+      e.FLabel JMP;
+
+  t.Globals t.Locals (e.TLabel) (e.FLabel) (not t.BoolExpr)
+    = <BoolExpr t.Globals t.Locals (e.FLabel) (e.TLabel) t.BoolExpr>;
+
+  t.Globals (e.LocalsL (_bool_count s.BoolNum) e.LocalsR) (e.TLabel) (e.FLabel) (t.BoolExprL and t.BoolExprR)
+    , (e.LocalsL (_bool_count <Add s.BoolNum 1>) e.LocalsR) : t.Locals1
+    , <Name t.Locals1 _func_name> : SUCC s.FuncName
+    , '_bool_' <itoa s.BoolNum> '_' s.FuncName : e.BoolName
+    , <BoolExpr t.Globals t.Locals1 (e.BoolName) (e.FLabel) t.BoolExprL> : t.Locals2 e.L
+    , <BoolExpr t.Globals t.Locals2 (e.TLabel) (e.FLabel) t.BoolExprR> : t.Locals3 e.R
+    = t.Locals3
+      e.L '\n'
+      ':' e.BoolName '\n'
+      e.R '\n';
+
+  t.Globals (e.LocalsL (_bool_count s.BoolNum) e.LocalsR) (e.TLabel) (e.FLabel) (t.BoolExprL or t.BoolExprR)
+    , (e.LocalsL (_bool_count <Add s.BoolNum 1>) e.LocalsR) : t.Locals1
+    , <Name t.Locals1 _func_name> : SUCC s.FuncName
+    , '_bool_' <itoa s.BoolNum> '_' s.FuncName : e.BoolName
+    , <BoolExpr t.Globals t.Locals1 (e.TLabel) (e.BoolName) t.BoolExprL> : t.Locals2 e.L
+    , <BoolExpr t.Globals t.Locals2 (e.TLabel) (e.FLabel) t.BoolExprR> : t.Locals3 e.R
+    = t.Locals3
+      e.L '\n'
+      ':' e.BoolName '\n'
+      e.R '\n';
+
+  t.Globals t.Locals (e.TLabel) (e.FLabel) (t.ExprL s.RelOp t.ExprR)
+    , <Expr t.Globals t.Locals t.ExprL> : t.Locals1 e.L
+    , <Expr t.Globals t.Locals1 t.ExprR> : t.Locals2 e.R
+    = t.Locals2
+      e.L '\n'
+      e.R '\n'
+      CMP e.TLabel <RelOp s.RelOp> '\n'
+      e.FLabel JMP;
+}
+
+* Symb
+itoa {
+  s.Int, <Compare s.Int 9> : {
+      '+' = <itoa <Div s.Int 10>> <itoa <Mod s.Int 10>>;
+      e._ = <Chr <Add 48 s.Int>>
+    };
+}

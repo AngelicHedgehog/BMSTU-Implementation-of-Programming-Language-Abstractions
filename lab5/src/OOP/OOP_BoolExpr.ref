@@ -1,0 +1,39 @@
+*$FROM src/OOP/OOP_Expr.ref
+$EXTERN OOP_Expr;
+
+/**
+  <OOP_BoolExpr
+      TRUE | FALSE
+    | (t.Expr s.RelOp t.Expr)
+    | (not t.BoolExpr)
+    | (t.BoolExpr and t.BoolExpr)
+    | (t.BoolExpr or t.BoolExpr)
+    | (isinstance e.ObjectPtr s.Name)
+  > == t.BoolExpr
+*/
+$ENTRY OOP_BoolExpr {
+  (not t.BoolExpr) = (not <OOP_BoolExpr t.BoolExpr>);
+  (t.BoolExprL and t.BoolExprR) = (<OOP_BoolExpr t.BoolExprL> and <OOP_BoolExpr t.BoolExprR>);
+  (t.BoolExprL or t.BoolExprR) = (<OOP_BoolExpr t.BoolExprL> or <OOP_BoolExpr t.BoolExprR>);
+
+  (isinstance t.ObjectPtr s.Name)
+    = (
+      (let ((vtable_let__ 1) (res_let__ 1))
+        (vtable_let__ "=" (L <OOP_Expr t.ObjectPtr>))
+        (while (
+          ((L vtable_let__) "<>" 0) and
+          ((L vtable_let__) "<>" <Implode_Ext <Explode s.Name> '_vtbl__'>)
+        )
+          (vtable_let__ "=" (L (L vtable_let__)))
+        )
+        (if ((L vtable_let__) "<>" 0)
+          (res_let__ "=" 1)
+        else
+          (res_let__ "=" 0)
+        )
+        (L res_let__)
+      ) "==" 1);
+
+  (t.ExprL s.RelOp t.ExprR) = (<OOP_Expr t.ExprL> s.RelOp <OOP_Expr t.ExprR>);
+  e.Other = e.Other;
+}

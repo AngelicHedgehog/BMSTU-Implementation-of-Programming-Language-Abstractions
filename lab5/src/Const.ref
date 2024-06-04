@@ -1,0 +1,11 @@
+*$FROM src/ConstExpr.ref
+$EXTERN ConstExpr;
+
+/**
+  <Const t.Globals (const s.Name "=" t.ConstExpr)> == t.Globals
+*/
+$ENTRY Const {
+  (e.Globals) (const s.Name "=" t.ConstExpr)
+    , <ConstExpr (e.Globals) t.ConstExpr> : s.ConstVal
+    = (e.Globals (s.Name s.ConstVal));
+}
