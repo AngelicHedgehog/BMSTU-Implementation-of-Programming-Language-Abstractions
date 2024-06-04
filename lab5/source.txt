@@ -33,7 +33,6 @@
 (var heap_order__ 1 "=" min_block_order__)
 (var heap_start__ 1)
 
-
 (function getHeapBlock__ (size)
     (return ((L PROGRAM_SIZE) "+" ((L size) "-" min_block_order__)))
 )
@@ -124,7 +123,8 @@
     (if ((((L block) "-" (L heap_start__)) "&" (1 "<<" (L ((L block) "+" 2)))) "==" 0)
         (buddy "=" ((L block) "+" (1 "<<" (L ((L block) "+" 2)))))
     else
-        (buddy "=" ((L block) "-" (1 "<<" (L ((L block) "+" 2)))))
+        (buddy "=" (L block))
+        (block "=" ((L block) "-" (1 "<<" (L ((L block) "+" 2)))))
     )
 
     (if (((L ((L buddy) "+" 3)) "==" 1) or ((L ((L block) "+" 2)) "<>" (L ((L buddy) "+" 2))))
@@ -191,11 +191,11 @@
 
     (block ((block1 1) (block2 1) (block3 1))
         (call printHeap)
-        (block1 "=" (call allocBlock__ 5))
-        (call printHeap)
         (block2 "=" (call allocBlock__ 500))
         (call printHeap)
         (block3 "=" (call allocBlock__ 25))
+        (call printHeap)
+        (block1 "=" (call allocBlock__ 5))
         (call printHeap)
         (call deallocBlock__ (L block2))
         (call printHeap)
