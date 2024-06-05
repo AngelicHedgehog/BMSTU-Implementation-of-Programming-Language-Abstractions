@@ -182,11 +182,6 @@
     )
 )
 
-(class DynVarBase__ ()
-    (method delete__ (self)
-    )
-)
-
 (function refInc__ (ref)
     (if ((L ref) "<>" 0)
         (call inc__ ((L ref) "-" ref_links_count__))
