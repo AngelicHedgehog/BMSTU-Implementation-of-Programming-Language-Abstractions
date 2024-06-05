@@ -447,6 +447,38 @@ GETRV SETRV __refDec__ JMP
 GETFP SETSP SETFP 
 1 RETN 
 
+:_prepareHeap__ 
+GETFP GETSP SETFP 
+GETFP GETSP SETFP 
+2 PUSHN 
+GETFP 1 SUB 1 3 LSHIFT SAVE 
+GETFP 2 SUB _MEMORY_SIZE LOAD _PROGRAM_SIZE LOAD 64 ADD SUB SAVE 
+_heap_order__ LOAD _getHeapBlock__ CALL GETRV 0 SAVE 
+:_loop_while_0_prepareHeap__ 
+GETFP 1 SUB LOAD 
+GETFP 2 SUB LOAD 
+CMP _true_while_0_prepareHeap__ JLE 
+_exit_while_0_prepareHeap__ JMP 
+:_true_while_0_prepareHeap__ 
+_heap_order__ LOAD _getHeapBlock__ CALL GETRV 0 SAVE 
+_heap_order__ _inc__ CALL GETRV DROP 
+GETFP 1 SUB GETFP 1 SUB LOAD 1 LSHIFT SAVE 
+_loop_while_0_prepareHeap__ JMP 
+:_exit_while_0_prepareHeap__ 
+_heap_order__ _dec__ CALL GETRV DROP 
+GETFP SETSP SETFP 
+_heap_start__ _heap_order__ LOAD _getHeapBlock__ CALL GETRV 1 ADD SAVE 
+_heap_start__ LOAD 2 ADD _heap_order__ LOAD SAVE 
+_heap_start__ LOAD _insertBlock__ CALL GETRV DROP 
+GETFP GETSP SETFP 
+1 PUSHN 
+GETFP 1 SUB 0 SAVE 
+GETFP 1 SUB LOAD SETRV GETFP SETSP SETFP 
+GETRV SETRV __prepareHeap__ JMP 
+:__prepareHeap__ 
+GETFP SETSP SETFP 
+JMP 
+
 :_genNode 
 GETFP GETSP SETFP 
 1 PUSHN 
@@ -526,27 +558,7 @@ GETFP 1 SUB 0 SAVE
 GETFP 2 SUB 0 SAVE 
 GETFP 3 SUB 0 SAVE 
 GETFP 4 SUB 0 SAVE 
-GETFP GETSP SETFP 
-2 PUSHN 
-GETFP 1 SUB 1 3 LSHIFT SAVE 
-GETFP 2 SUB _MEMORY_SIZE LOAD _PROGRAM_SIZE LOAD 64 ADD SUB SAVE 
-_heap_order__ LOAD _getHeapBlock__ CALL GETRV 0 SAVE 
-:_loop_while_0_main 
-GETFP 1 SUB LOAD 
-GETFP 2 SUB LOAD 
-CMP _true_while_0_main JLE 
-_exit_while_0_main JMP 
-:_true_while_0_main 
-_heap_order__ LOAD _getHeapBlock__ CALL GETRV 0 SAVE 
-_heap_order__ _inc__ CALL GETRV DROP 
-GETFP 1 SUB GETFP 1 SUB LOAD 1 LSHIFT SAVE 
-_loop_while_0_main JMP 
-:_exit_while_0_main 
-_heap_order__ _dec__ CALL GETRV DROP 
-GETFP SETSP SETFP 
-_heap_start__ _heap_order__ LOAD _getHeapBlock__ CALL GETRV 1 ADD SAVE 
-_heap_start__ LOAD 2 ADD _heap_order__ LOAD SAVE 
-_heap_start__ LOAD _insertBlock__ CALL GETRV DROP 
+_prepareHeap__ CALL GETRV DROP 
 _printHeap__ CALL GETRV DROP 
 GETFP GETSP SETFP 
 2 PUSHN 
@@ -603,6 +615,14 @@ GETFP GETSP SETFP
 2 PUSHN 
 GETFP 2 SUB 0 SAVE 
 GETFP 1 SUB GETFP LOAD 4 SUB SAVE 
+GETFP 2 SUB LOAD _refInc__ CALL GETRV DROP 
+GETFP 1 SUB LOAD LOAD _refDec__ CALL GETRV DROP 
+GETFP 1 SUB LOAD GETFP 2 SUB LOAD SAVE 
+GETFP SETSP SETFP 
+GETFP GETSP SETFP 
+2 PUSHN 
+GETFP 2 SUB 0 SAVE 
+GETFP 1 SUB GETFP LOAD 1 SUB SAVE 
 GETFP 2 SUB LOAD _refInc__ CALL GETRV DROP 
 GETFP 1 SUB LOAD LOAD _refDec__ CALL GETRV DROP 
 GETFP 1 SUB LOAD GETFP 2 SUB LOAD SAVE 

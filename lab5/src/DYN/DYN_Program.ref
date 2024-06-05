@@ -6,7 +6,7 @@ $EXTERN DYN_Definition, LoadExpr;
   <DYN_Program t.Definition*> == e.Program
 */
 $ENTRY DYN_Program {
-    e.Definitions = <_DYN_Program <LoadExpr 'src/DYN/DYN_GlobalCode.txt'> e.Definitions>;
+    e.Definitions = <_DYN_Program <LoadExpr 'src/DYN/DYN_RunTimeLib.txt'> e.Definitions>;
 }
 
 _DYN_Program {

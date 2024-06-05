@@ -19,7 +19,7 @@ $ENTRY DYN_Definition {
   (function main t.Params (var e.Vars) e.Body)
     = <DYN_Function
         (function main t.Params (var e.Vars)
-          <LoadExpr 'src/DYN/DYN_MainFCode.txt'>
+          (call prepareHeap__)
           e.Body)
       >;
   (function main t.Params e.Body)
