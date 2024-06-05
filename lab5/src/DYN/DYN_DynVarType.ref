@@ -19,7 +19,9 @@ $ENTRY DYN_DynVarType {
     (dynvar s.Name e.Defs) = <DYN_DynVarType (dynvar s.Name (refs) e.Defs)>;
 }
 
-Len {
+Len { /* Lenw */
   t._ e.Names = <Add <Len e.Names> 1>;
   /* пусто */ = 0;
+
+*  e.Expr, <Lenw e.Expr> : s.Len e._ = s.Len;
 }
